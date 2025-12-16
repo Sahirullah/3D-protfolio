@@ -75,15 +75,57 @@ function Navbar() {
                 fontSize: '1rem',
                 fontWeight: '500',
                 cursor: 'pointer',
-                transition: 'all 0.3s ease',
+                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
                 position: 'relative',
-                padding: '0.5rem 0'
+                padding: '0.8rem 1.2rem',
+                borderRadius: '12px',
+                overflow: 'hidden'
               }}
               onMouseEnter={(e) => {
                 e.target.style.color = '#00d4ff';
+                e.target.style.background = 'rgba(0, 212, 255, 0.1)';
+                e.target.style.transform = 'translateY(-2px) scale(1.05)';
+                e.target.style.boxShadow = '0 8px 25px rgba(0, 212, 255, 0.2)';
+                e.target.style.textShadow = '0 0 10px rgba(0, 212, 255, 0.5)';
+                
+                // Create animated underline effect
+                if (!e.target.querySelector('.nav-underline')) {
+                  const underline = document.createElement('div');
+                  underline.className = 'nav-underline';
+                  underline.style.cssText = `
+                    position: absolute;
+                    bottom: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 2px;
+                    background: linear-gradient(90deg, #00d4ff, #4ecdc4);
+                    transform: scaleX(0);
+                    transform-origin: left;
+                    transition: transform 0.3s ease;
+                  `;
+                  e.target.appendChild(underline);
+                  setTimeout(() => {
+                    underline.style.transform = 'scaleX(1)';
+                  }, 10);
+                }
               }}
               onMouseLeave={(e) => {
                 e.target.style.color = '#b0b0b0';
+                e.target.style.background = 'none';
+                e.target.style.transform = 'translateY(0) scale(1)';
+                e.target.style.boxShadow = 'none';
+                e.target.style.textShadow = 'none';
+                
+                // Remove underline
+                const underline = e.target.querySelector('.nav-underline');
+                if (underline) {
+                  underline.style.transform = 'scaleX(0)';
+                  setTimeout(() => {
+                    if (underline.parentNode) {
+                      underline.parentNode.removeChild(underline);
+                    }
+                  }, 300);
+                }
               }}>
                 {item.label}
               </button>
@@ -101,17 +143,57 @@ function Navbar() {
           fontSize: '0.9rem',
           fontWeight: '600',
           cursor: 'pointer',
-          transition: 'all 0.3s ease',
+          transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
           textTransform: 'uppercase',
-          letterSpacing: '0.5px'
+          letterSpacing: '0.5px',
+          position: 'relative',
+          overflow: 'hidden'
         }}
         onMouseEnter={(e) => {
-          e.target.style.transform = 'translateY(-2px)';
-          e.target.style.boxShadow = '0 8px 25px rgba(0, 212, 255, 0.4)';
+          e.target.style.transform = 'translateY(-3px) scale(1.05)';
+          e.target.style.boxShadow = '0 15px 35px rgba(0, 212, 255, 0.6)';
+          e.target.style.background = 'linear-gradient(135deg, #00d4ff, #4ecdc4, #00d4ff)';
+          e.target.style.backgroundSize = '200% 200%';
+          e.target.style.animation = 'gradientShift 2s ease infinite';
+          
+          // Add ripple effect
+          if (!e.target.querySelector('.ripple-effect')) {
+            const ripple = document.createElement('div');
+            ripple.className = 'ripple-effect';
+            ripple.style.cssText = `
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              width: 0;
+              height: 0;
+              background: rgba(255, 255, 255, 0.3);
+              border-radius: 50%;
+              transform: translate(-50%, -50%);
+              transition: width 0.6s ease, height 0.6s ease;
+            `;
+            e.target.appendChild(ripple);
+            setTimeout(() => {
+              ripple.style.width = '200px';
+              ripple.style.height = '200px';
+            }, 10);
+          }
         }}
         onMouseLeave={(e) => {
-          e.target.style.transform = 'translateY(0)';
+          e.target.style.transform = 'translateY(0) scale(1)';
           e.target.style.boxShadow = 'none';
+          e.target.style.background = 'linear-gradient(135deg, #00d4ff, #4ecdc4)';
+          e.target.style.animation = 'none';
+          
+          // Remove ripple effect
+          const ripple = e.target.querySelector('.ripple-effect');
+          if (ripple) {
+            ripple.style.opacity = '0';
+            setTimeout(() => {
+              if (ripple.parentNode) {
+                ripple.parentNode.removeChild(ripple);
+              }
+            }, 300);
+          }
         }}>
           Hire Me
         </button>
@@ -758,531 +840,626 @@ function App() {
           </div>
         </div>
 
-        {/* Projects Section - Enhanced 3D Gallery */}
+        {/* Projects Section - Compact Gallery */}
         <div style={{
-          minHeight: '100vh',
-          padding: '5rem 2rem',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.95) 0%, rgba(10, 10, 30, 0.9) 50%, rgba(0, 0, 0, 0.95) 100%)',
-          backdropFilter: 'blur(20px)',
-          position: 'relative',
-          overflow: 'hidden'
-        }}>
-          {/* Background Animated Elements */}
-          <div style={{
-            position: 'absolute',
-            top: '10%',
-            left: '5%',
-            width: '100px',
-            height: '100px',
-            background: 'linear-gradient(45deg, #00d4ff33, transparent)',
-            borderRadius: '50%',
-            filter: 'blur(40px)',
-            animation: 'float 6s ease-in-out infinite'
-          }}></div>
-          <div style={{
-            position: 'absolute',
-            bottom: '15%',
-            right: '8%',
-            width: '150px',
-            height: '150px',
-            background: 'linear-gradient(45deg, #4ecdc433, transparent)',
-            borderRadius: '50%',
-            filter: 'blur(50px)',
-            animation: 'float 8s ease-in-out infinite reverse'
-          }}></div>
-
-          <div style={{
-            maxWidth: '1400px',
-            width: '100%',
-            position: 'relative',
-            zIndex: 2
-          }}>
-            {/* Enhanced Header */}
-            <div style={{
-              textAlign: 'center',
-              marginBottom: '5rem'
-            }}>
-              <div style={{
-                fontSize: '1rem',
-                color: '#00d4ff',
-                fontWeight: '600',
-                textTransform: 'uppercase',
-                letterSpacing: '3px',
-                marginBottom: '1rem',
-                opacity: '0.8'
-              }}>
-                Featured Work
-              </div>
-              <h2 style={{
-                fontSize: 'clamp(3rem, 8vw, 5rem)',
-                fontWeight: '900',
-                marginBottom: '1.5rem',
-                background: 'linear-gradient(135deg, #00d4ff 0%, #4ecdc4 30%, #ff6b6b 60%, #ffd93d 100%)',
-                backgroundSize: '300% 300%',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-                animation: 'gradientShift 6s ease-in-out infinite',
-                textShadow: '0 0 60px rgba(0, 212, 255, 0.3)'
-              }}>
-                Project Showcase
-              </h2>
-              <p style={{
-                fontSize: '1.3rem',
-                color: '#b0b0b0',
-                maxWidth: '700px',
-                margin: '0 auto',
-                lineHeight: '1.7',
-                fontWeight: '300'
-              }}>
-                Explore my latest creations where cutting-edge technology meets creative innovation. 
-                Each project represents a unique journey in 3D web development.
-              </p>
-            </div>
-            
-            {/* Enhanced Project Grid */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
-              gap: '3rem',
-              marginBottom: '4rem'
-            }}>
-              {[
-                { 
-                  title: '3D E-commerce Platform', 
-                  subtitle: 'Next-Gen Shopping Experience',
-                  tech: ['React', 'Three.js', 'WebGL', 'Node.js', 'MongoDB'],
-                  description: 'Revolutionary e-commerce platform featuring interactive 3D product visualization, real-time customization, and immersive shopping experiences that increase conversion rates by 300%.',
-                  color: '#00d4ff',
-                  gradient: 'linear-gradient(135deg, #00d4ff, #0099cc)',
-                  icon: '🛒',
-                  status: 'Live Project',
-                  year: '2024'
-                },
-                { 
-                  title: 'VR Portfolio Experience', 
-                  subtitle: 'Immersive Virtual Reality',
-                  tech: ['A-Frame', 'WebXR', 'Blender', 'JavaScript', 'GSAP'],
-                  description: 'Groundbreaking VR portfolio experience using WebXR technology, allowing clients to explore work in virtual reality directly from their browser without any downloads.',
-                  color: '#4ecdc4',
-                  gradient: 'linear-gradient(135deg, #4ecdc4, #26a69a)',
-                  icon: '🥽',
-                  status: 'Award Winner',
-                  year: '2024'
-                },
-                { 
-                  title: 'Interactive 3D Game', 
-                  subtitle: 'Multiplayer Physics Engine',
-                  tech: ['Three.js', 'Socket.io', 'Cannon.js', 'Express', 'Redis'],
-                  description: 'Browser-based multiplayer 3D game featuring advanced physics simulation, real-time networking, and cross-platform compatibility with mobile and desktop.',
-                  color: '#ff6b6b',
-                  gradient: 'linear-gradient(135deg, #ff6b6b, #ee5a52)',
-                  icon: '🎮',
-                  status: 'Open Source',
-                  year: '2023'
-                }
-              ].map((project, i) => (
-                <div key={i} style={{
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  backdropFilter: 'blur(30px)',
-                  border: '1px solid rgba(255, 255, 255, 0.08)',
-                  borderRadius: '30px',
-                  padding: '0',
-                  transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
-                  cursor: 'pointer',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-20px) scale(1.02)';
-                  e.currentTarget.style.borderColor = project.color;
-                  e.currentTarget.style.boxShadow = `0 30px 60px rgba(${
-                    project.color === '#00d4ff' ? '0, 212, 255' : 
-                    project.color === '#4ecdc4' ? '78, 205, 196' : 
-                    '255, 107, 107'
-                  }, 0.4)`;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
-                  e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.3)';
-                }}>
-                  {/* Project Header with Icon */}
-                  <div style={{
-                    background: project.gradient,
-                    padding: '2.5rem 2.5rem 1.5rem',
-                    position: 'relative',
-                    overflow: 'hidden'
-                  }}>
-                    {/* Animated Background Pattern */}
-                    <div style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      background: `radial-gradient(circle at 30% 20%, rgba(255,255,255,0.1) 0%, transparent 50%), 
-                                   radial-gradient(circle at 70% 80%, rgba(255,255,255,0.05) 0%, transparent 50%)`,
-                      opacity: 0.6
-                    }}></div>
-                    
-                    <div style={{
-                      position: 'relative',
-                      zIndex: 2
-                    }}>
-                      <div style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'flex-start',
-                        marginBottom: '1rem'
-                      }}>
-                        <div style={{
-                          fontSize: '3rem',
-                          filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
-                        }}>
-                          {project.icon}
-                        </div>
-                        <div style={{
-                          background: 'rgba(255, 255, 255, 0.2)',
-                          backdropFilter: 'blur(10px)',
-                          padding: '0.5rem 1rem',
-                          borderRadius: '20px',
-                          fontSize: '0.8rem',
-                          fontWeight: '600',
-                          color: 'white',
-                          textTransform: 'uppercase',
-                          letterSpacing: '1px'
-                        }}>
-                          {project.status}
-                        </div>
-                      </div>
-                      
-                      <h3 style={{
-                        fontSize: '1.8rem',
-                        color: 'white',
-                        marginBottom: '0.5rem',
-                        fontWeight: '800',
-                        textShadow: '0 2px 4px rgba(0,0,0,0.3)'
-                      }}>
-                        {project.title}
-                      </h3>
-                      
-                      <p style={{
-                        color: 'rgba(255, 255, 255, 0.9)',
-                        fontSize: '1rem',
-                        fontWeight: '500',
-                        margin: 0
-                      }}>
-                        {project.subtitle}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Project Content */}
-                  <div style={{
-                    padding: '2.5rem'
-                  }}>
-                    <p style={{
-                      color: '#c0c0c0',
-                      lineHeight: '1.7',
-                      marginBottom: '2rem',
-                      fontSize: '1rem'
-                    }}>
-                      {project.description}
-                    </p>
-                    
-                    {/* Tech Stack */}
-                    <div style={{
-                      marginBottom: '2rem'
-                    }}>
-                      <h4 style={{
-                        color: '#fff',
-                        fontSize: '0.9rem',
-                        fontWeight: '700',
-                        marginBottom: '1rem',
-                        textTransform: 'uppercase',
-                        letterSpacing: '1px'
-                      }}>
-                        Tech Stack
-                      </h4>
-                      <div style={{
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        gap: '0.8rem'
-                      }}>
-                        {project.tech.map((tech, techIndex) => (
-                          <span key={techIndex} style={{
-                            background: `linear-gradient(135deg, ${project.color}20, ${project.color}10)`,
-                            border: `1px solid ${project.color}40`,
-                            color: project.color,
-                            padding: '0.5rem 1rem',
-                            borderRadius: '15px',
-                            fontSize: '0.85rem',
-                            fontWeight: '600',
-                            backdropFilter: 'blur(10px)'
-                          }}>
-                            {tech}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Project Actions */}
-                    <div style={{
-                      display: 'flex',
-                      gap: '1rem',
-                      alignItems: 'center',
-                      justifyContent: 'space-between'
-                    }}>
-                      <div style={{
-                        display: 'flex',
-                        gap: '1rem'
-                      }}>
-                        <button style={{
-                          background: project.gradient,
-                          border: 'none',
-                          color: 'white',
-                          padding: '0.8rem 1.5rem',
-                          borderRadius: '20px',
-                          fontSize: '0.9rem',
-                          fontWeight: '600',
-                          cursor: 'pointer',
-                          transition: 'all 0.3s ease',
-                          textTransform: 'uppercase',
-                          letterSpacing: '1px'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.target.style.transform = 'scale(1.05)';
-                          e.target.style.boxShadow = `0 8px 20px ${project.color}40`;
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.transform = 'scale(1)';
-                          e.target.style.boxShadow = 'none';
-                        }}>
-                          View Live
-                        </button>
-                        
-                        <button style={{
-                          background: 'rgba(255, 255, 255, 0.1)',
-                          border: `1px solid ${project.color}40`,
-                          color: project.color,
-                          padding: '0.8rem 1.5rem',
-                          borderRadius: '20px',
-                          fontSize: '0.9rem',
-                          fontWeight: '600',
-                          cursor: 'pointer',
-                          backdropFilter: 'blur(10px)',
-                          transition: 'all 0.3s ease',
-                          textTransform: 'uppercase',
-                          letterSpacing: '1px'
-                        }}
-                        onMouseEnter={(e) => {
-                          e.target.style.background = `${project.color}20`;
-                          e.target.style.borderColor = project.color;
-                        }}
-                        onMouseLeave={(e) => {
-                          e.target.style.background = 'rgba(255, 255, 255, 0.1)';
-                          e.target.style.borderColor = `${project.color}40`;
-                        }}>
-                          Source Code
-                        </button>
-                      </div>
-                      
-                      <div style={{
-                        color: '#888',
-                        fontSize: '0.9rem',
-                        fontWeight: '600'
-                      }}>
-                        {project.year}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Call to Action */}
-            <div style={{
-              textAlign: 'center',
-              marginTop: '4rem'
-            }}>
-              <button style={{
-                background: 'linear-gradient(135deg, #00d4ff, #4ecdc4)',
-                border: 'none',
-                color: 'white',
-                padding: '1.2rem 3rem',
-                borderRadius: '50px',
-                fontSize: '1.1rem',
-                fontWeight: '700',
-                cursor: 'pointer',
-                textTransform: 'uppercase',
-                letterSpacing: '2px',
-                boxShadow: '0 15px 35px rgba(0, 212, 255, 0.4)',
-                transition: 'all 0.3s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.transform = 'translateY(-3px) scale(1.05)';
-                e.target.style.boxShadow = '0 25px 50px rgba(0, 212, 255, 0.6)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.transform = 'translateY(0) scale(1)';
-                e.target.style.boxShadow = '0 15px 35px rgba(0, 212, 255, 0.4)';
-              }}>
-                View All Projects
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Contact Section - 3D Interaction Zone */}
-        <div style={{
-          minHeight: '100vh',
-          padding: '5rem 2rem',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          padding: '4rem 2rem',
           background: 'rgba(0, 0, 0, 0.9)',
-          backdropFilter: 'blur(20px)'
+          backdropFilter: 'blur(15px)'
         }}>
           <div style={{
-            maxWidth: '800px',
-            width: '100%',
-            textAlign: 'center'
+            maxWidth: '1200px',
+            margin: '0 auto'
           }}>
             <h2 style={{
               fontSize: 'clamp(2.5rem, 6vw, 4rem)',
               fontWeight: '800',
-              marginBottom: '2rem',
-              background: 'linear-gradient(135deg, #00d4ff, #4ecdc4, #ff6b6b)',
+              marginBottom: '3rem',
+              textAlign: 'center',
+              background: 'linear-gradient(135deg, #00d4ff, #4ecdc4)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               backgroundClip: 'text'
             }}>
-              Let's Create Something Extraordinary
+              Featured Projects
             </h2>
             
-            <p style={{
-              fontSize: '1.3rem',
-              color: '#b0b0b0',
-              marginBottom: '4rem',
-              lineHeight: '1.6'
-            }}>
-              Ready to bring your vision to life with cutting-edge 3D technology? 
-              Let's discuss your next project and create something amazing together.
-            </p>
-            
             <div style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              backdropFilter: 'blur(25px)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-              borderRadius: '25px',
-              padding: '3rem',
-              marginBottom: '3rem',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+              gap: '2rem'
             }}>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-                gap: '2rem',
-                marginBottom: '2rem'
-              }}>
-                <div style={{
-                  textAlign: 'left'
+              {[
+                { 
+                  title: '3D E-commerce Platform', 
+                  tech: 'React • Three.js • WebGL',
+                  description: 'Interactive 3D product visualization with real-time customization',
+                  color: '#00d4ff',
+                  icon: '🛒'
+                },
+                { 
+                  title: 'VR Portfolio Experience', 
+                  tech: 'A-Frame • WebXR • Blender',
+                  description: 'Immersive virtual reality portfolio using WebXR technology',
+                  color: '#4ecdc4',
+                  icon: '🥽'
+                },
+                { 
+                  title: 'Interactive 3D Game', 
+                  tech: 'Three.js • Socket.io • Physics',
+                  description: 'Browser-based multiplayer 3D game with physics simulation',
+                  color: '#ff6b6b',
+                  icon: '🎮'
+                }
+              ].map((project, i) => (
+                <div key={i} style={{
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  backdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '20px',
+                  padding: '2rem',
+                  transition: 'all 0.3s ease',
+                  cursor: 'pointer'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-10px)';
+                  e.currentTarget.style.borderColor = project.color;
+                  e.currentTarget.style.boxShadow = `0 20px 40px rgba(${
+                    project.color === '#00d4ff' ? '0, 212, 255' : 
+                    project.color === '#4ecdc4' ? '78, 205, 196' : 
+                    '255, 107, 107'
+                  }, 0.3)`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.boxShadow = 'none';
                 }}>
+                  <div style={{
+                    fontSize: '3rem',
+                    marginBottom: '1rem',
+                    textAlign: 'center'
+                  }}>
+                    {project.icon}
+                  </div>
+                  
                   <h3 style={{
-                    color: '#00d4ff',
-                    fontSize: '1.2rem',
-                    marginBottom: '1rem'
+                    fontSize: '1.4rem',
+                    color: '#fff',
+                    marginBottom: '0.5rem',
+                    fontWeight: '700'
                   }}>
-                    📧 Email
+                    {project.title}
                   </h3>
+                  
                   <p style={{
-                    color: '#b0b0b0'
+                    color: '#b0b0b0',
+                    lineHeight: '1.6',
+                    marginBottom: '1.5rem',
+                    fontSize: '0.95rem'
                   }}>
-                    john.doe@example.com
+                    {project.description}
                   </p>
+                  
+                  <div style={{
+                    fontSize: '0.85rem',
+                    color: project.color,
+                    fontWeight: '600',
+                    marginBottom: '1.5rem'
+                  }}>
+                    {project.tech}
+                  </div>
+
+                  <div style={{
+                    display: 'flex',
+                    gap: '1rem'
+                  }}>
+                    <button style={{
+                      background: `linear-gradient(135deg, ${project.color}, ${project.color}cc)`,
+                      border: 'none',
+                      color: 'white',
+                      padding: '0.7rem 1.2rem',
+                      borderRadius: '15px',
+                      fontSize: '0.8rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.transform = 'scale(1.05)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.transform = 'scale(1)';
+                    }}>
+                      View Live
+                    </button>
+                    
+                    <button style={{
+                      background: 'rgba(255, 255, 255, 0.1)',
+                      border: `1px solid ${project.color}40`,
+                      color: project.color,
+                      padding: '0.7rem 1.2rem',
+                      borderRadius: '15px',
+                      fontSize: '0.8rem',
+                      fontWeight: '600',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.background = `${project.color}20`;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.background = 'rgba(255, 255, 255, 0.1)';
+                    }}>
+                      Code
+                    </button>
+                  </div>
                 </div>
-                
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Contact Section - Interactive Contact Form */}
+        <div style={{
+          minHeight: '100vh',
+          padding: '5rem 2rem',
+          background: 'rgba(0, 0, 0, 0.9)',
+          backdropFilter: 'blur(20px)'
+        }}>
+          <div style={{
+            maxWidth: '1200px',
+            margin: '0 auto'
+          }}>
+            <div style={{
+              textAlign: 'center',
+              marginBottom: '4rem'
+            }}>
+              <h2 style={{
+                fontSize: 'clamp(2.5rem, 6vw, 4rem)',
+                fontWeight: '800',
+                marginBottom: '1rem',
+                background: 'linear-gradient(135deg, #00d4ff, #4ecdc4, #ff6b6b)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
+              }}>
+                Let's Work Together
+              </h2>
+              
+              <p style={{
+                fontSize: '1.2rem',
+                color: '#b0b0b0',
+                maxWidth: '600px',
+                margin: '0 auto',
+                lineHeight: '1.6'
+              }}>
+                Ready to bring your vision to life? Send me a message and let's create something extraordinary together.
+              </p>
+            </div>
+
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))',
+              gap: '3rem',
+              alignItems: 'start'
+            }}>
+              {/* Contact Form */}
+              <div style={{
+                background: 'rgba(255, 255, 255, 0.05)',
+                backdropFilter: 'blur(25px)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+                borderRadius: '25px',
+                padding: '3rem',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
+              }}>
+                <h3 style={{
+                  fontSize: '1.5rem',
+                  color: '#fff',
+                  marginBottom: '2rem',
+                  fontWeight: '700'
+                }}>
+                  Send Message
+                </h3>
+
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  // Handle form submission here
+                  alert('Message sent! (This is a demo)');
+                }}>
+                  <div style={{
+                    display: 'grid',
+                    gap: '1.5rem'
+                  }}>
+                    {/* Name Input */}
+                    <div>
+                      <label style={{
+                        display: 'block',
+                        color: '#00d4ff',
+                        fontSize: '0.9rem',
+                        fontWeight: '600',
+                        marginBottom: '0.5rem',
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px'
+                      }}>
+                        Full Name *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        style={{
+                          width: '100%',
+                          padding: '1rem 1.5rem',
+                          background: 'rgba(255, 255, 255, 0.05)',
+                          border: '1px solid rgba(255, 255, 255, 0.2)',
+                          borderRadius: '15px',
+                          color: '#fff',
+                          fontSize: '1rem',
+                          transition: 'all 0.3s ease',
+                          backdropFilter: 'blur(10px)',
+                          outline: 'none'
+                        }}
+                        placeholder="Enter your full name"
+                        onFocus={(e) => {
+                          e.target.style.borderColor = '#00d4ff';
+                          e.target.style.boxShadow = '0 0 20px rgba(0, 212, 255, 0.3)';
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                          e.target.style.boxShadow = 'none';
+                        }}
+                      />
+                    </div>
+
+                    {/* Email Input */}
+                    <div>
+                      <label style={{
+                        display: 'block',
+                        color: '#4ecdc4',
+                        fontSize: '0.9rem',
+                        fontWeight: '600',
+                        marginBottom: '0.5rem',
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px'
+                      }}>
+                        Email Address *
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        style={{
+                          width: '100%',
+                          padding: '1rem 1.5rem',
+                          background: 'rgba(255, 255, 255, 0.05)',
+                          border: '1px solid rgba(255, 255, 255, 0.2)',
+                          borderRadius: '15px',
+                          color: '#fff',
+                          fontSize: '1rem',
+                          transition: 'all 0.3s ease',
+                          backdropFilter: 'blur(10px)',
+                          outline: 'none'
+                        }}
+                        placeholder="your.email@example.com"
+                        onFocus={(e) => {
+                          e.target.style.borderColor = '#4ecdc4';
+                          e.target.style.boxShadow = '0 0 20px rgba(78, 205, 196, 0.3)';
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                          e.target.style.boxShadow = 'none';
+                        }}
+                      />
+                    </div>
+
+                    {/* Subject Input */}
+                    <div>
+                      <label style={{
+                        display: 'block',
+                        color: '#ff6b6b',
+                        fontSize: '0.9rem',
+                        fontWeight: '600',
+                        marginBottom: '0.5rem',
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px'
+                      }}>
+                        Project Type
+                      </label>
+                      <select
+                        style={{
+                          width: '100%',
+                          padding: '1rem 1.5rem',
+                          background: 'rgba(255, 255, 255, 0.05)',
+                          border: '1px solid rgba(255, 255, 255, 0.2)',
+                          borderRadius: '15px',
+                          color: '#fff',
+                          fontSize: '1rem',
+                          transition: 'all 0.3s ease',
+                          backdropFilter: 'blur(10px)',
+                          outline: 'none',
+                          cursor: 'pointer'
+                        }}
+                        onFocus={(e) => {
+                          e.target.style.borderColor = '#ff6b6b';
+                          e.target.style.boxShadow = '0 0 20px rgba(255, 107, 107, 0.3)';
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                          e.target.style.boxShadow = 'none';
+                        }}
+                      >
+                        <option value="">Select project type</option>
+                        <option value="3d-website">3D Website Development</option>
+                        <option value="webgl-app">WebGL Application</option>
+                        <option value="vr-experience">VR Experience</option>
+                        <option value="interactive-game">Interactive Game</option>
+                        <option value="consultation">Consultation</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+
+                    {/* Message Textarea */}
+                    <div>
+                      <label style={{
+                        display: 'block',
+                        color: '#ffd93d',
+                        fontSize: '0.9rem',
+                        fontWeight: '600',
+                        marginBottom: '0.5rem',
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px'
+                      }}>
+                        Message *
+                      </label>
+                      <textarea
+                        required
+                        rows="5"
+                        style={{
+                          width: '100%',
+                          padding: '1rem 1.5rem',
+                          background: 'rgba(255, 255, 255, 0.05)',
+                          border: '1px solid rgba(255, 255, 255, 0.2)',
+                          borderRadius: '15px',
+                          color: '#fff',
+                          fontSize: '1rem',
+                          transition: 'all 0.3s ease',
+                          backdropFilter: 'blur(10px)',
+                          outline: 'none',
+                          resize: 'vertical',
+                          minHeight: '120px'
+                        }}
+                        placeholder="Tell me about your project, goals, timeline, and budget..."
+                        onFocus={(e) => {
+                          e.target.style.borderColor = '#ffd93d';
+                          e.target.style.boxShadow = '0 0 20px rgba(255, 217, 61, 0.3)';
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = 'rgba(255, 255, 255, 0.2)';
+                          e.target.style.boxShadow = 'none';
+                        }}
+                      />
+                    </div>
+
+                    {/* Submit Button */}
+                    <button
+                      type="submit"
+                      style={{
+                        width: '100%',
+                        padding: '1.2rem 2rem',
+                        background: 'linear-gradient(135deg, #00d4ff, #4ecdc4)',
+                        border: 'none',
+                        borderRadius: '15px',
+                        color: 'white',
+                        fontSize: '1rem',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px',
+                        transition: 'all 0.3s ease',
+                        marginTop: '1rem'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.transform = 'translateY(-2px)';
+                        e.target.style.boxShadow = '0 15px 35px rgba(0, 212, 255, 0.4)';
+                        e.target.style.background = 'linear-gradient(135deg, #00d4ff, #4ecdc4, #00d4ff)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.transform = 'translateY(0)';
+                        e.target.style.boxShadow = 'none';
+                        e.target.style.background = 'linear-gradient(135deg, #00d4ff, #4ecdc4)';
+                      }}
+                    >
+                      Send Message
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+              {/* Contact Information */}
+              <div>
                 <div style={{
-                  textAlign: 'left'
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  backdropFilter: 'blur(25px)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: '25px',
+                  padding: '3rem',
+                  marginBottom: '2rem',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
                 }}>
                   <h3 style={{
-                    color: '#4ecdc4',
-                    fontSize: '1.2rem',
-                    marginBottom: '1rem'
+                    fontSize: '1.5rem',
+                    color: '#fff',
+                    marginBottom: '2rem',
+                    fontWeight: '700'
                   }}>
-                    📱 Phone
+                    Get In Touch
                   </h3>
-                  <p style={{
-                    color: '#b0b0b0'
+
+                  <div style={{
+                    display: 'grid',
+                    gap: '2rem'
                   }}>
-                    +1 (555) 123-4567
-                  </p>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '1rem'
+                    }}>
+                      <div style={{
+                        width: '50px',
+                        height: '50px',
+                        background: 'linear-gradient(135deg, #00d4ff, #4ecdc4)',
+                        borderRadius: '15px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '1.5rem'
+                      }}>
+                        📧
+                      </div>
+                      <div>
+                        <h4 style={{
+                          color: '#00d4ff',
+                          fontSize: '1rem',
+                          marginBottom: '0.5rem',
+                          fontWeight: '600'
+                        }}>
+                          Email
+                        </h4>
+                        <p style={{
+                          color: '#b0b0b0',
+                          margin: 0
+                        }}>
+                          john.doe@example.com
+                        </p>
+                      </div>
+                    </div>
+
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '1rem'
+                    }}>
+                      <div style={{
+                        width: '50px',
+                        height: '50px',
+                        background: 'linear-gradient(135deg, #4ecdc4, #26a69a)',
+                        borderRadius: '15px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '1.5rem'
+                      }}>
+                        📱
+                      </div>
+                      <div>
+                        <h4 style={{
+                          color: '#4ecdc4',
+                          fontSize: '1rem',
+                          marginBottom: '0.5rem',
+                          fontWeight: '600'
+                        }}>
+                          Phone
+                        </h4>
+                        <p style={{
+                          color: '#b0b0b0',
+                          margin: 0
+                        }}>
+                          +1 (555) 123-4567
+                        </p>
+                      </div>
+                    </div>
+
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '1rem'
+                    }}>
+                      <div style={{
+                        width: '50px',
+                        height: '50px',
+                        background: 'linear-gradient(135deg, #ff6b6b, #ee5a52)',
+                        borderRadius: '15px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '1.5rem'
+                      }}>
+                        📍
+                      </div>
+                      <div>
+                        <h4 style={{
+                          color: '#ff6b6b',
+                          fontSize: '1rem',
+                          marginBottom: '0.5rem',
+                          fontWeight: '600'
+                        }}>
+                          Location
+                        </h4>
+                        <p style={{
+                          color: '#b0b0b0',
+                          margin: 0
+                        }}>
+                          San Francisco, CA
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quick Action Buttons */}
+                <div style={{
+                  display: 'grid',
+                  gap: '1rem'
+                }}>
+                  <button style={{
+                    padding: '1rem 2rem',
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    border: '1px solid rgba(0, 212, 255, 0.3)',
+                    borderRadius: '15px',
+                    color: '#00d4ff',
+                    fontSize: '1rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    backdropFilter: 'blur(10px)',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.background = 'rgba(0, 212, 255, 0.1)';
+                    e.target.style.borderColor = '#00d4ff';
+                    e.target.style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.background = 'rgba(255, 255, 255, 0.1)';
+                    e.target.style.borderColor = 'rgba(0, 212, 255, 0.3)';
+                    e.target.style.transform = 'translateY(0)';
+                  }}>
+                    📄 Download Resume
+                  </button>
+                  
+                  <button style={{
+                    padding: '1rem 2rem',
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    border: '1px solid rgba(78, 205, 196, 0.3)',
+                    borderRadius: '15px',
+                    color: '#4ecdc4',
+                    fontSize: '1rem',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    backdropFilter: 'blur(10px)',
+                    transition: 'all 0.3s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.background = 'rgba(78, 205, 196, 0.1)';
+                    e.target.style.borderColor = '#4ecdc4';
+                    e.target.style.transform = 'translateY(-2px)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.background = 'rgba(255, 255, 255, 0.1)';
+                    e.target.style.borderColor = 'rgba(78, 205, 196, 0.3)';
+                    e.target.style.transform = 'translateY(0)';
+                  }}>
+                    💼 Schedule Call
+                  </button>
                 </div>
               </div>
-            </div>
-            
-            <div style={{
-              display: 'flex',
-              gap: '2rem',
-              justifyContent: 'center',
-              flexWrap: 'wrap'
-            }}>
-              <button style={{
-                padding: '1.5rem 3rem',
-                background: 'linear-gradient(135deg, #00d4ff, #4ecdc4)',
-                border: 'none',
-                borderRadius: '50px',
-                color: 'white',
-                fontSize: '1.1rem',
-                fontWeight: '700',
-                cursor: 'pointer',
-                textTransform: 'uppercase',
-                letterSpacing: '2px',
-                boxShadow: '0 15px 35px rgba(0, 212, 255, 0.4)',
-                transition: 'all 0.3s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.transform = 'translateY(-5px) scale(1.05)';
-                e.target.style.boxShadow = '0 25px 50px rgba(0, 212, 255, 0.6)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.transform = 'translateY(0) scale(1)';
-                e.target.style.boxShadow = '0 15px 35px rgba(0, 212, 255, 0.4)';
-              }}>
-                Start a Project
-              </button>
-              
-              <button style={{
-                padding: '1.5rem 3rem',
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: '2px solid rgba(0, 212, 255, 0.3)',
-                borderRadius: '50px',
-                color: 'white',
-                fontSize: '1.1rem',
-                fontWeight: '700',
-                cursor: 'pointer',
-                backdropFilter: 'blur(10px)',
-                textTransform: 'uppercase',
-                letterSpacing: '2px',
-                transition: 'all 0.3s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.transform = 'translateY(-5px) scale(1.05)';
-                e.target.style.borderColor = '#00d4ff';
-                e.target.style.boxShadow = '0 25px 50px rgba(0, 212, 255, 0.2)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.transform = 'translateY(0) scale(1)';
-                e.target.style.borderColor = 'rgba(0, 212, 255, 0.3)';
-                e.target.style.boxShadow = 'none';
-              }}>
-                Download Resume
-              </button>
             </div>
           </div>
         </div>
