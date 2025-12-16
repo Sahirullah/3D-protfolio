@@ -1,0 +1,1 @@
+// Intersection observer hook - to be implemented
