@@ -5,7 +5,7 @@ import Footer from './sections/Footer';
 import './index.css';
 
 // Navigation Component
-function Navbar() {
+function Navbar({ isDarkMode, toggleTheme }) {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -32,9 +32,13 @@ function Navbar() {
       right: 0,
       zIndex: 1000,
       padding: '1rem 0',
-      background: isScrolled ? 'rgba(10, 10, 10, 0.9)' : 'transparent',
+      background: isScrolled ? 
+        (isDarkMode ? 'rgba(10, 10, 10, 0.9)' : 'rgba(255, 255, 255, 0.9)') : 
+        'transparent',
       backdropFilter: isScrolled ? 'blur(20px)' : 'none',
-      borderBottom: isScrolled ? '1px solid rgba(255, 255, 255, 0.1)' : 'none',
+      borderBottom: isScrolled ? 
+        (isDarkMode ? '1px solid rgba(255, 255, 255, 0.1)' : '1px solid rgba(0, 0, 0, 0.1)') : 
+        (isDarkMode ? '1px solid rgba(255, 255, 255, 0.05)' : '1px solid rgba(0, 0, 0, 0.05)'),
       transition: 'all 0.3s ease'
     }}>
       <div style={{
@@ -71,7 +75,7 @@ function Navbar() {
               <button style={{
                 background: 'none',
                 border: 'none',
-                color: '#b0b0b0',
+                color: isDarkMode ? '#b0b0b0' : '#666',
                 fontSize: '1rem',
                 fontWeight: '500',
                 cursor: 'pointer',
@@ -132,6 +136,39 @@ function Navbar() {
             </li>
           ))}
         </ul>
+
+        {/* Theme Toggle Button */}
+        <button
+          onClick={toggleTheme}
+          style={{
+            width: '45px',
+            height: '45px',
+            background: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+            border: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'}`,
+            borderRadius: '50%',
+            color: isDarkMode ? '#ffd93d' : '#ff6b6b',
+            fontSize: '1.2rem',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            backdropFilter: 'blur(10px)',
+            marginRight: '1rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.transform = 'scale(1.1) rotate(15deg)';
+            e.target.style.boxShadow = `0 8px 25px ${isDarkMode ? 'rgba(255, 217, 61, 0.3)' : 'rgba(255, 107, 107, 0.3)'}`;
+            e.target.style.borderColor = isDarkMode ? '#ffd93d' : '#ff6b6b';
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.transform = 'scale(1) rotate(0deg)';
+            e.target.style.boxShadow = 'none';
+            e.target.style.borderColor = isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)';
+          }}
+        >
+          {isDarkMode ? '☀️' : '🌙'}
+        </button>
 
         {/* CTA Button */}
         <button style={{
@@ -336,10 +373,127 @@ function Scene() {
 }
 
 function App() {
+  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const toggleTheme = () => {
+    setIsDarkMode(!isDarkMode);
+  };
+
+  // Simulate loading time
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Theme colors
+  const theme = {
+    background: isDarkMode ? '#000' : '#f8f9fa',
+    sectionBg: isDarkMode ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+    cardBg: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+    cardBgHover: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+    textPrimary: isDarkMode ? '#fff' : '#333',
+    textSecondary: isDarkMode ? '#b0b0b0' : '#666',
+    border: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+    borderHover: isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+    fogColor: isDarkMode ? '#000' : '#f0f0f0',
+    shadow: isDarkMode ? 'rgba(0, 0, 0, 0.3)' : 'rgba(0, 0, 0, 0.1)'
+  };
+
+  // Apply theme to document root for global CSS variables
+  useEffect(() => {
+    document.documentElement.style.setProperty('--theme-bg', theme.background);
+    document.documentElement.style.setProperty('--theme-text-primary', theme.textPrimary);
+    document.documentElement.style.setProperty('--theme-text-secondary', theme.textSecondary);
+    document.documentElement.style.setProperty('--theme-card-bg', theme.cardBg);
+    document.documentElement.style.setProperty('--theme-border', theme.border);
+  }, [isDarkMode]);
+
+  // Loader Component
+  const Loader = () => (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      background: isDarkMode ? '#000' : '#f8f9fa',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 9999,
+      transition: 'opacity 0.5s ease'
+    }}>
+      {/* Logo Animation */}
+      <div style={{
+        fontSize: '4rem',
+        fontWeight: '900',
+        background: 'linear-gradient(135deg, #00d4ff, #4ecdc4)',
+        WebkitBackgroundClip: 'text',
+        WebkitTextFillColor: 'transparent',
+        backgroundClip: 'text',
+        marginBottom: '2rem',
+        animation: 'pulse 2s ease-in-out infinite'
+      }}>
+        JD
+      </div>
+
+      {/* Loading Animation */}
+      <div style={{
+        width: '60px',
+        height: '60px',
+        border: `3px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}`,
+        borderTop: '3px solid #00d4ff',
+        borderRadius: '50%',
+        animation: 'spin 1s linear infinite',
+        marginBottom: '1rem'
+      }}></div>
+
+      {/* Loading Text */}
+      <p style={{
+        color: theme.textSecondary,
+        fontSize: '1rem',
+        fontWeight: '500',
+        letterSpacing: '2px',
+        textTransform: 'uppercase'
+      }}>
+        Loading Experience...
+      </p>
+
+      {/* Progress Bar */}
+      <div style={{
+        width: '200px',
+        height: '2px',
+        background: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+        borderRadius: '1px',
+        marginTop: '1rem',
+        overflow: 'hidden'
+      }}>
+        <div style={{
+          width: '100%',
+          height: '100%',
+          background: 'linear-gradient(90deg, #00d4ff, #4ecdc4)',
+          borderRadius: '1px',
+          animation: 'loadProgress 2.5s ease-out forwards'
+        }}></div>
+      </div>
+    </div>
+  );
+
+  if (isLoading) {
+    return <Loader />;
+  }
+
   return (
-    <div className="App" style={{ background: '#000' }}>
+    <div className={`App ${isDarkMode ? 'dark-theme' : 'light-theme'}`} style={{ 
+      background: theme.background,
+      animation: 'fadeIn 0.8s ease-out'
+    }}>
       {/* Navigation Header */}
-      <Navbar />
+      <Navbar isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
       
       {/* 3D Canvas */}
       <Canvas
@@ -348,8 +502,8 @@ function App() {
         dpr={[1, 2]}
       >
         <Suspense fallback={null}>
-          <Environment preset="night" />
-          <fog attach="fog" args={['#000', 8, 30]} />
+          <Environment preset={isDarkMode ? "night" : "dawn"} />
+          <fog attach="fog" args={[theme.fogColor, 8, 30]} />
           <Scene />
           <OrbitControls 
             enableZoom={false} 
@@ -391,7 +545,7 @@ function App() {
           <h2 style={{
             fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
             fontWeight: '300',
-            color: '#b0b0b0',
+            color: theme.textSecondary,
             marginBottom: '2rem',
             letterSpacing: '2px',
             textTransform: 'uppercase'
@@ -401,7 +555,7 @@ function App() {
           
           <p style={{
             fontSize: '1.2rem',
-            color: '#888',
+            color: theme.textSecondary,
             marginBottom: '3rem',
             maxWidth: '600px',
             lineHeight: '1.6'
@@ -460,7 +614,7 @@ function App() {
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            color: '#666',
+            color: theme.textSecondary,
             fontSize: '0.8rem',
             textTransform: 'uppercase',
             letterSpacing: '2px'
@@ -483,7 +637,7 @@ function App() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'rgba(0, 0, 0, 0.8)',
+          background: theme.sectionBg,
           backdropFilter: 'blur(10px)'
         }}>
           <div style={{
@@ -515,18 +669,64 @@ function App() {
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 borderRadius: '20px',
                 padding: '2.5rem',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                cursor: 'pointer',
+                position: 'relative',
+                overflow: 'hidden'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-10px) scale(1.02)';
+                e.currentTarget.style.borderColor = '#00d4ff';
+                e.currentTarget.style.boxShadow = '0 25px 50px rgba(0, 212, 255, 0.3)';
+                e.currentTarget.style.background = 'rgba(0, 212, 255, 0.08)';
+                
+                // Add glow effect
+                if (!e.currentTarget.querySelector('.glow-effect')) {
+                  const glow = document.createElement('div');
+                  glow.className = 'glow-effect';
+                  glow.style.cssText = `
+                    position: absolute;
+                    top: -50%;
+                    left: -50%;
+                    width: 200%;
+                    height: 200%;
+                    background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
+                    pointer-events: none;
+                    transition: opacity 0.3s ease;
+                  `;
+                  e.currentTarget.appendChild(glow);
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.3)';
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                
+                // Remove glow effect
+                const glow = e.currentTarget.querySelector('.glow-effect');
+                if (glow) {
+                  glow.style.opacity = '0';
+                  setTimeout(() => {
+                    if (glow.parentNode) {
+                      glow.parentNode.removeChild(glow);
+                    }
+                  }, 300);
+                }
               }}>
                 <h3 style={{
                   fontSize: '1.5rem',
                   color: '#00d4ff',
-                  marginBottom: '1rem'
+                  marginBottom: '1rem',
+                  transition: 'all 0.3s ease'
                 }}>
                   🎨 Creative Vision
                 </h3>
                 <p style={{
                   color: '#b0b0b0',
-                  lineHeight: '1.7'
+                  lineHeight: '1.7',
+                  transition: 'color 0.3s ease'
                 }}>
                   I'm a passionate Creative Developer and 3D Artist with over 5 years of experience 
                   creating immersive digital experiences that push the boundaries of web technology.
@@ -539,18 +739,64 @@ function App() {
                 border: '1px solid rgba(255, 255, 255, 0.1)',
                 borderRadius: '20px',
                 padding: '2.5rem',
-                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                cursor: 'pointer',
+                position: 'relative',
+                overflow: 'hidden'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-10px) scale(1.02)';
+                e.currentTarget.style.borderColor = '#4ecdc4';
+                e.currentTarget.style.boxShadow = '0 25px 50px rgba(78, 205, 196, 0.3)';
+                e.currentTarget.style.background = 'rgba(78, 205, 196, 0.08)';
+                
+                // Add glow effect
+                if (!e.currentTarget.querySelector('.glow-effect')) {
+                  const glow = document.createElement('div');
+                  glow.className = 'glow-effect';
+                  glow.style.cssText = `
+                    position: absolute;
+                    top: -50%;
+                    left: -50%;
+                    width: 200%;
+                    height: 200%;
+                    background: radial-gradient(circle, rgba(78, 205, 196, 0.1) 0%, transparent 70%);
+                    pointer-events: none;
+                    transition: opacity 0.3s ease;
+                  `;
+                  e.currentTarget.appendChild(glow);
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.3)';
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                
+                // Remove glow effect
+                const glow = e.currentTarget.querySelector('.glow-effect');
+                if (glow) {
+                  glow.style.opacity = '0';
+                  setTimeout(() => {
+                    if (glow.parentNode) {
+                      glow.parentNode.removeChild(glow);
+                    }
+                  }, 300);
+                }
               }}>
                 <h3 style={{
                   fontSize: '1.5rem',
                   color: '#4ecdc4',
-                  marginBottom: '1rem'
+                  marginBottom: '1rem',
+                  transition: 'all 0.3s ease'
                 }}>
                   ⚡ Technical Excellence
                 </h3>
                 <p style={{
                   color: '#b0b0b0',
-                  lineHeight: '1.7'
+                  lineHeight: '1.7',
+                  transition: 'color 0.3s ease'
                 }}>
                   My expertise spans across React, Three.js, WebGL, and modern animation libraries. 
                   I specialize in creating interactive 3D websites that tell compelling stories.
@@ -570,13 +816,69 @@ function App() {
                 borderRadius: '20px',
                 padding: '2rem',
                 backdropFilter: 'blur(10px)',
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)'
+                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
+                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                cursor: 'pointer',
+                position: 'relative',
+                overflow: 'hidden'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-8px) scale(1.05)';
+                e.currentTarget.style.borderColor = '#00d4ff';
+                e.currentTarget.style.boxShadow = '0 20px 40px rgba(0, 212, 255, 0.4)';
+                e.currentTarget.style.background = 'rgba(0, 212, 255, 0.2)';
+                
+                // Animate the number
+                const numberEl = e.currentTarget.querySelector('.stat-number');
+                if (numberEl) {
+                  numberEl.style.transform = 'scale(1.1)';
+                  numberEl.style.textShadow = '0 0 20px rgba(0, 212, 255, 0.8)';
+                }
+                
+                // Add pulse effect
+                if (!e.currentTarget.querySelector('.pulse-effect')) {
+                  const pulse = document.createElement('div');
+                  pulse.className = 'pulse-effect';
+                  pulse.style.cssText = `
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    width: 100px;
+                    height: 100px;
+                    background: rgba(0, 212, 255, 0.2);
+                    border-radius: 50%;
+                    transform: translate(-50%, -50%) scale(0);
+                    animation: pulse 1.5s ease-out infinite;
+                    pointer-events: none;
+                  `;
+                  e.currentTarget.appendChild(pulse);
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                e.currentTarget.style.borderColor = 'rgba(0, 212, 255, 0.3)';
+                e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.2)';
+                e.currentTarget.style.background = 'rgba(0, 212, 255, 0.1)';
+                
+                // Reset number animation
+                const numberEl = e.currentTarget.querySelector('.stat-number');
+                if (numberEl) {
+                  numberEl.style.transform = 'scale(1)';
+                  numberEl.style.textShadow = 'none';
+                }
+                
+                // Remove pulse effect
+                const pulse = e.currentTarget.querySelector('.pulse-effect');
+                if (pulse && pulse.parentNode) {
+                  pulse.parentNode.removeChild(pulse);
+                }
               }}>
-                <div style={{ 
+                <div className="stat-number" style={{ 
                   fontSize: '3rem', 
                   color: '#00d4ff', 
                   marginBottom: '0.5rem',
-                  fontWeight: '800'
+                  fontWeight: '800',
+                  transition: 'all 0.3s ease'
                 }}>
                   50+
                 </div>
@@ -584,7 +886,8 @@ function App() {
                   color: '#888', 
                   fontSize: '1rem',
                   textTransform: 'uppercase',
-                  letterSpacing: '1px'
+                  letterSpacing: '1px',
+                  transition: 'color 0.3s ease'
                 }}>
                   Projects Completed
                 </div>
@@ -596,13 +899,69 @@ function App() {
                 borderRadius: '20px',
                 padding: '2rem',
                 backdropFilter: 'blur(10px)',
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)'
+                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
+                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                cursor: 'pointer',
+                position: 'relative',
+                overflow: 'hidden'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-8px) scale(1.05)';
+                e.currentTarget.style.borderColor = '#4ecdc4';
+                e.currentTarget.style.boxShadow = '0 20px 40px rgba(78, 205, 196, 0.4)';
+                e.currentTarget.style.background = 'rgba(78, 205, 196, 0.2)';
+                
+                // Animate the number
+                const numberEl = e.currentTarget.querySelector('.stat-number');
+                if (numberEl) {
+                  numberEl.style.transform = 'scale(1.1)';
+                  numberEl.style.textShadow = '0 0 20px rgba(78, 205, 196, 0.8)';
+                }
+                
+                // Add pulse effect
+                if (!e.currentTarget.querySelector('.pulse-effect')) {
+                  const pulse = document.createElement('div');
+                  pulse.className = 'pulse-effect';
+                  pulse.style.cssText = `
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    width: 100px;
+                    height: 100px;
+                    background: rgba(78, 205, 196, 0.2);
+                    border-radius: 50%;
+                    transform: translate(-50%, -50%) scale(0);
+                    animation: pulse 1.5s ease-out infinite;
+                    pointer-events: none;
+                  `;
+                  e.currentTarget.appendChild(pulse);
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                e.currentTarget.style.borderColor = 'rgba(78, 205, 196, 0.3)';
+                e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.2)';
+                e.currentTarget.style.background = 'rgba(78, 205, 196, 0.1)';
+                
+                // Reset number animation
+                const numberEl = e.currentTarget.querySelector('.stat-number');
+                if (numberEl) {
+                  numberEl.style.transform = 'scale(1)';
+                  numberEl.style.textShadow = 'none';
+                }
+                
+                // Remove pulse effect
+                const pulse = e.currentTarget.querySelector('.pulse-effect');
+                if (pulse && pulse.parentNode) {
+                  pulse.parentNode.removeChild(pulse);
+                }
               }}>
-                <div style={{ 
+                <div className="stat-number" style={{ 
                   fontSize: '3rem', 
                   color: '#4ecdc4', 
                   marginBottom: '0.5rem',
-                  fontWeight: '800'
+                  fontWeight: '800',
+                  transition: 'all 0.3s ease'
                 }}>
                   5+
                 </div>
@@ -610,7 +969,8 @@ function App() {
                   color: '#888', 
                   fontSize: '1rem',
                   textTransform: 'uppercase',
-                  letterSpacing: '1px'
+                  letterSpacing: '1px',
+                  transition: 'color 0.3s ease'
                 }}>
                   Years Experience
                 </div>
@@ -622,13 +982,69 @@ function App() {
                 borderRadius: '20px',
                 padding: '2rem',
                 backdropFilter: 'blur(10px)',
-                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)'
+                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)',
+                transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                cursor: 'pointer',
+                position: 'relative',
+                overflow: 'hidden'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-8px) scale(1.05)';
+                e.currentTarget.style.borderColor = '#ff6b6b';
+                e.currentTarget.style.boxShadow = '0 20px 40px rgba(255, 107, 107, 0.4)';
+                e.currentTarget.style.background = 'rgba(255, 107, 107, 0.2)';
+                
+                // Animate the number
+                const numberEl = e.currentTarget.querySelector('.stat-number');
+                if (numberEl) {
+                  numberEl.style.transform = 'scale(1.1)';
+                  numberEl.style.textShadow = '0 0 20px rgba(255, 107, 107, 0.8)';
+                }
+                
+                // Add pulse effect
+                if (!e.currentTarget.querySelector('.pulse-effect')) {
+                  const pulse = document.createElement('div');
+                  pulse.className = 'pulse-effect';
+                  pulse.style.cssText = `
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    width: 100px;
+                    height: 100px;
+                    background: rgba(255, 107, 107, 0.2);
+                    border-radius: 50%;
+                    transform: translate(-50%, -50%) scale(0);
+                    animation: pulse 1.5s ease-out infinite;
+                    pointer-events: none;
+                  `;
+                  e.currentTarget.appendChild(pulse);
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                e.currentTarget.style.borderColor = 'rgba(255, 107, 107, 0.3)';
+                e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.2)';
+                e.currentTarget.style.background = 'rgba(255, 107, 107, 0.1)';
+                
+                // Reset number animation
+                const numberEl = e.currentTarget.querySelector('.stat-number');
+                if (numberEl) {
+                  numberEl.style.transform = 'scale(1)';
+                  numberEl.style.textShadow = 'none';
+                }
+                
+                // Remove pulse effect
+                const pulse = e.currentTarget.querySelector('.pulse-effect');
+                if (pulse && pulse.parentNode) {
+                  pulse.parentNode.removeChild(pulse);
+                }
               }}>
-                <div style={{ 
+                <div className="stat-number" style={{ 
                   fontSize: '3rem', 
                   color: '#ff6b6b', 
                   marginBottom: '0.5rem',
-                  fontWeight: '800'
+                  fontWeight: '800',
+                  transition: 'all 0.3s ease'
                 }}>
                   30+
                 </div>
@@ -636,7 +1052,8 @@ function App() {
                   color: '#888', 
                   fontSize: '1rem',
                   textTransform: 'uppercase',
-                  letterSpacing: '1px'
+                  letterSpacing: '1px',
+                  transition: 'color 0.3s ease'
                 }}>
                   Happy Clients
                 </div>
@@ -1470,6 +1887,23 @@ function App() {
       
       {/* CSS Animations */}
       <style jsx>{`
+        /* Theme Styles */
+        .dark-theme {
+          --text-primary: #fff;
+          --text-secondary: #b0b0b0;
+          --card-bg: rgba(255, 255, 255, 0.05);
+          --border-color: rgba(255, 255, 255, 0.1);
+          --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+        
+        .light-theme {
+          --text-primary: #333;
+          --text-secondary: #666;
+          --card-bg: rgba(0, 0, 0, 0.05);
+          --border-color: rgba(0, 0, 0, 0.1);
+          --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+        
         @keyframes gradientShift {
           0%, 100% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
@@ -1478,6 +1912,37 @@ function App() {
         @keyframes scrollPulse {
           0%, 100% { opacity: 0.4; }
           50% { opacity: 1; }
+        }
+        
+        @keyframes pulse {
+          0% { 
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 1;
+          }
+          100% { 
+            transform: translate(-50%, -50%) scale(4);
+            opacity: 0;
+          }
+        }
+        
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-20px); }
+        }
+        
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes loadProgress {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(0%); }
+        }
+        
+        @keyframes fadeIn {
+          0% { opacity: 0; }
+          100% { opacity: 1; }
         }
         
         button:hover {
