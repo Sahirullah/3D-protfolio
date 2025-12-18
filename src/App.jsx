@@ -489,9 +489,10 @@ function App() {
     </div>
   );
 
-  if (isLoading) {
-    return <Loader />;
-  }
+  // Temporarily disable loader for debugging
+  // if (isLoading) {
+  //   return <Loader />;
+  // }
 
   return (
     <div className={`App ${isDarkMode ? 'dark-theme' : 'light-theme'}`} style={{ 
