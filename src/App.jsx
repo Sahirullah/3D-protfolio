@@ -5,7 +5,7 @@ import Footer from './sections/Footer';
 import './index.css';
 
 // Navigation Component
-function Navbar({ isDarkMode, toggleTheme, playHoverSound, playClickSound, soundEnabled, setSoundEnabled }) {
+function Navbar({ isDarkMode, toggleTheme }) {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -138,42 +138,7 @@ function Navbar({ isDarkMode, toggleTheme, playHoverSound, playClickSound, sound
           ))}
         </ul>
 
-        {/* Sound Toggle Button */}
-        <button
-          onClick={() => {
-            setSoundEnabled(!soundEnabled);
-            playClickSound();
-          }}
-          style={{
-            width: '45px',
-            height: '45px',
-            background: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-            border: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'}`,
-            borderRadius: '50%',
-            color: soundEnabled ? '#4ecdc4' : (isDarkMode ? '#666' : '#999'),
-            fontSize: '1.2rem',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            backdropFilter: 'blur(10px)',
-            marginRight: '1rem',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.transform = 'scale(1.1)';
-            e.target.style.boxShadow = `0 8px 25px ${soundEnabled ? 'rgba(78, 205, 196, 0.3)' : 'rgba(102, 102, 102, 0.3)'}`;
-            e.target.style.borderColor = soundEnabled ? '#4ecdc4' : (isDarkMode ? '#666' : '#999');
-            playHoverSound();
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.transform = 'scale(1)';
-            e.target.style.boxShadow = 'none';
-            e.target.style.borderColor = isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)';
-          }}
-        >
-          {soundEnabled ? '🔊' : '🔇'}
-        </button>
+
 
         {/* Theme Toggle Button */}
         <button
@@ -416,34 +381,41 @@ function Scene() {
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
-  const [soundEnabled, setSoundEnabled] = useState(false);
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
   };
 
-  // Sound effects
+  // Pleasant sound effects
   const playHoverSound = () => {
     if (soundEnabled && window.AudioContext) {
       try {
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
         const oscillator = audioContext.createOscillator();
         const gainNode = audioContext.createGain();
+        const filterNode = audioContext.createBiquadFilter();
         
-        oscillator.connect(gainNode);
+        oscillator.connect(filterNode);
+        filterNode.connect(gainNode);
         gainNode.connect(audioContext.destination);
         
-        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-        oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.1);
+        // Gentle bell-like sound
+        oscillator.frequency.setValueAtTime(880, audioContext.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(1320, audioContext.currentTime + 0.08);
+        oscillator.type = 'sine';
+        
+        // Soft filter for warmth
+        filterNode.type = 'lowpass';
+        filterNode.frequency.setValueAtTime(2000, audioContext.currentTime);
         
         gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-        gainNode.gain.linearRampToValueAtTime(0.05, audioContext.currentTime + 0.01);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
+        gainNode.gain.linearRampToValueAtTime(0.02, audioContext.currentTime + 0.005);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.08);
         
         oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 0.1);
+        oscillator.stop(audioContext.currentTime + 0.08);
         
-        setTimeout(() => audioContext.close(), 200);
+        setTimeout(() => audioContext.close(), 150);
       } catch (error) {
         console.log('Audio not supported');
       }
@@ -454,21 +426,35 @@ function App() {
     if (soundEnabled && window.AudioContext) {
       try {
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
+        const oscillator1 = audioContext.createOscillator();
+        const oscillator2 = audioContext.createOscillator();
+        const gainNode1 = audioContext.createGain();
+        const gainNode2 = audioContext.createGain();
+        const masterGain = audioContext.createGain();
         
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
+        oscillator1.connect(gainNode1);
+        oscillator2.connect(gainNode2);
+        gainNode1.connect(masterGain);
+        gainNode2.connect(masterGain);
+        masterGain.connect(audioContext.destination);
         
-        oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
-        oscillator.frequency.exponentialRampToValueAtTime(300, audioContext.currentTime + 0.15);
+        // Pleasant chord-like click
+        oscillator1.frequency.setValueAtTime(523, audioContext.currentTime); // C5
+        oscillator2.frequency.setValueAtTime(659, audioContext.currentTime); // E5
+        oscillator1.type = 'sine';
+        oscillator2.type = 'sine';
         
-        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-        gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.01);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.15);
+        masterGain.gain.setValueAtTime(0, audioContext.currentTime);
+        masterGain.gain.linearRampToValueAtTime(0.03, audioContext.currentTime + 0.01);
+        masterGain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.12);
         
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 0.15);
+        gainNode1.gain.setValueAtTime(0.7, audioContext.currentTime);
+        gainNode2.gain.setValueAtTime(0.3, audioContext.currentTime);
+        
+        oscillator1.start(audioContext.currentTime);
+        oscillator2.start(audioContext.currentTime);
+        oscillator1.stop(audioContext.currentTime + 0.12);
+        oscillator2.stop(audioContext.currentTime + 0.12);
         
         setTimeout(() => audioContext.close(), 200);
       } catch (error) {
@@ -477,45 +463,71 @@ function App() {
     }
   };
 
-  // Background ambient sound
+  // Pleasant ambient background sound
   useEffect(() => {
     let audioContext;
-    let oscillator1, oscillator2, gainNode1, gainNode2;
+    let oscillators = [];
+    let gainNodes = [];
+    let intervalId;
     
     if (soundEnabled && !isLoading && window.AudioContext) {
       try {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
         
-        // Create ambient background sound
-        oscillator1 = audioContext.createOscillator();
-        oscillator2 = audioContext.createOscillator();
-        gainNode1 = audioContext.createGain();
-        gainNode2 = audioContext.createGain();
+        // Create a more pleasant ambient soundscape
+        const frequencies = [110, 165, 220, 330]; // Harmonic frequencies
+        const volumes = [0.005, 0.003, 0.004, 0.002]; // Very low volumes
         
-        oscillator1.connect(gainNode1);
-        oscillator2.connect(gainNode2);
-        gainNode1.connect(audioContext.destination);
-        gainNode2.connect(audioContext.destination);
+        frequencies.forEach((freq, index) => {
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          const filterNode = audioContext.createBiquadFilter();
+          
+          oscillator.connect(filterNode);
+          filterNode.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+          
+          oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
+          oscillator.type = index % 2 === 0 ? 'sine' : 'triangle';
+          
+          // Add subtle filtering for warmth
+          filterNode.type = 'lowpass';
+          filterNode.frequency.setValueAtTime(800, audioContext.currentTime);
+          filterNode.Q.setValueAtTime(0.5, audioContext.currentTime);
+          
+          gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+          gainNode.gain.linearRampToValueAtTime(volumes[index], audioContext.currentTime + 2);
+          
+          oscillator.start();
+          oscillators.push(oscillator);
+          gainNodes.push(gainNode);
+        });
         
-        oscillator1.frequency.setValueAtTime(220, audioContext.currentTime);
-        oscillator2.frequency.setValueAtTime(330, audioContext.currentTime);
+        // Add subtle frequency modulation for organic feel
+        intervalId = setInterval(() => {
+          if (audioContext && audioContext.state === 'running') {
+            oscillators.forEach((osc, index) => {
+              if (osc && osc.frequency) {
+                const baseFreq = frequencies[index];
+                const variation = Math.sin(Date.now() / 10000 + index) * 2;
+                osc.frequency.setValueAtTime(baseFreq + variation, audioContext.currentTime);
+              }
+            });
+          }
+        }, 100);
         
-        gainNode1.gain.setValueAtTime(0.01, audioContext.currentTime);
-        gainNode2.gain.setValueAtTime(0.008, audioContext.currentTime);
-        
-        oscillator1.type = 'sine';
-        oscillator2.type = 'triangle';
-        
-        oscillator1.start();
-        oscillator2.start();
       } catch (error) {
         console.log('Background audio not supported');
       }
     }
     
     return () => {
+      if (intervalId) clearInterval(intervalId);
       if (audioContext) {
         try {
+          oscillators.forEach(osc => {
+            if (osc) osc.stop();
+          });
           audioContext.close();
         } catch (error) {
           console.log('Error closing audio context');
@@ -524,11 +536,24 @@ function App() {
     };
   }, [soundEnabled, isLoading]);
 
-  // Simulate loading time
+  // Simulate loading time and enable audio
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1500); // Reduced loading time
+      // Enable audio context after user interaction
+      const enableAudio = () => {
+        if (window.AudioContext) {
+          const tempContext = new (window.AudioContext || window.webkitAudioContext)();
+          tempContext.resume().then(() => {
+            tempContext.close();
+          });
+        }
+        document.removeEventListener('click', enableAudio);
+        document.removeEventListener('keydown', enableAudio);
+      };
+      document.addEventListener('click', enableAudio);
+      document.addEventListener('keydown', enableAudio);
+    }, 1500);
     return () => clearTimeout(timer);
   }, []);
 
@@ -1268,9 +1293,9 @@ function App() {
                 { 
                   name: 'Three.js', 
                   level: '90%', 
-                  color: '#ffffff',
+                  color: isDarkMode ? '#ffffff' : '#000000',
                   logo: (
-                    <svg viewBox="0 0 24 24" width="32" height="32" fill="#ffffff">
+                    <svg viewBox="0 0 24 24" width="32" height="32" fill={isDarkMode ? '#ffffff' : '#000000'}>
                       <path d="M.38 0L.48 24 12 18.02 23.52 24 23.62 0 12 5.98.38 0M12 8.06L20.55 3.58 20.48 18.42 12 14.94V8.06M3.45 3.58L12 8.06V14.94L3.52 18.42 3.45 3.58Z"/>
                     </svg>
                   )
@@ -1341,9 +1366,9 @@ function App() {
                 }
               ].map((skill, i) => (
                 <div key={i} style={{
-                  background: 'rgba(255, 255, 255, 0.05)',
+                  background: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
                   backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  border: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}`,
                   borderRadius: '20px',
                   padding: '2rem 1rem',
                   transition: 'all 0.3s ease',
@@ -1364,16 +1389,17 @@ function App() {
                     skill.color === '#3776ab' ? '55, 118, 171' :
                     '255, 255, 255'
                   }, 0.3)`;
+                  playHoverSound();
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0) rotateX(0)';
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.borderColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
                   e.currentTarget.style.boxShadow = 'none';
                 }}>
                   <div style={{
                     width: '70px',
                     height: '70px',
-                    background: 'rgba(255, 255, 255, 0.1)',
+                    background: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
                     borderRadius: '20px',
                     margin: '0 auto 1rem',
                     display: 'flex',
@@ -1457,9 +1483,9 @@ function App() {
                 }
               ].map((project, i) => (
                 <div key={i} style={{
-                  background: 'rgba(255, 255, 255, 0.05)',
+                  background: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
                   backdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  border: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}`,
                   borderRadius: '20px',
                   padding: '2rem',
                   transition: 'all 0.3s ease',
@@ -1473,10 +1499,11 @@ function App() {
                     project.color === '#4ecdc4' ? '78, 205, 196' : 
                     '255, 107, 107'
                   }, 0.3)`;
+                  playHoverSound();
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.borderColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
                   e.currentTarget.style.boxShadow = 'none';
                 }}>
                   <div style={{
