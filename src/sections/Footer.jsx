@@ -1,8 +1,9 @@
 import React from 'react';
 
-const Footer = () => {
+const Footer = ({ isDarkMode, theme, playHoverSound }) => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (playHoverSound) playHoverSound();
   };
 
   return (

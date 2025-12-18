@@ -91,6 +91,7 @@ function Navbar({ isDarkMode, toggleTheme }) {
                 e.target.style.transform = 'translateY(-2px) scale(1.05)';
                 e.target.style.boxShadow = '0 8px 25px rgba(0, 212, 255, 0.2)';
                 e.target.style.textShadow = '0 0 10px rgba(0, 212, 255, 0.5)';
+                playHoverSound();
                 
                 // Create animated underline effect
                 if (!e.target.querySelector('.nav-underline')) {
@@ -137,6 +138,43 @@ function Navbar({ isDarkMode, toggleTheme }) {
           ))}
         </ul>
 
+        {/* Sound Toggle Button */}
+        <button
+          onClick={() => {
+            setIsSoundEnabled(!isSoundEnabled);
+            playClickSound();
+          }}
+          style={{
+            width: '45px',
+            height: '45px',
+            background: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+            border: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'}`,
+            borderRadius: '50%',
+            color: isSoundEnabled ? '#4ecdc4' : (isDarkMode ? '#888' : '#999'),
+            fontSize: '1.2rem',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            backdropFilter: 'blur(10px)',
+            marginRight: '1rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+          onMouseEnter={(e) => {
+            e.target.style.transform = 'scale(1.1)';
+            e.target.style.boxShadow = `0 8px 25px ${isSoundEnabled ? 'rgba(78, 205, 196, 0.3)' : 'rgba(136, 136, 136, 0.2)'}`;
+            e.target.style.borderColor = isSoundEnabled ? '#4ecdc4' : (isDarkMode ? '#888' : '#999');
+            playHoverSound();
+          }}
+          onMouseLeave={(e) => {
+            e.target.style.transform = 'scale(1)';
+            e.target.style.boxShadow = 'none';
+            e.target.style.borderColor = isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)';
+          }}
+        >
+          {isSoundEnabled ? '🔊' : '🔇'}
+        </button>
+
         {/* Theme Toggle Button */}
         <button
           onClick={toggleTheme}
@@ -167,7 +205,7 @@ function Navbar({ isDarkMode, toggleTheme }) {
             e.target.style.borderColor = isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)';
           }}
         >
-          {isDarkMode ? '☀️' : '🌙'}
+          {isDarkMode ? '🌙' : '☀️'}
         </button>
 
         {/* CTA Button */}
@@ -375,10 +413,108 @@ function Scene() {
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSoundEnabled, setIsSoundEnabled] = useState(false);
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
+    playHoverSound();
   };
+
+  // Sound effects
+  const playHoverSound = () => {
+    if (isSoundEnabled) {
+      // Create a subtle hover sound using Web Audio API
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.1);
+      
+      gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.01);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.1);
+    }
+  };
+
+  const playClickSound = () => {
+    if (isSoundEnabled) {
+      // Create a click sound
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioContext.destination);
+      
+      oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(300, audioContext.currentTime + 0.15);
+      
+      gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.15, audioContext.currentTime + 0.01);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+      
+      oscillator.start(audioContext.currentTime);
+      oscillator.stop(audioContext.currentTime + 0.15);
+    }
+  };
+
+  // Background ambient sound
+  useEffect(() => {
+    let audioContext;
+    let oscillator1, oscillator2, gainNode1, gainNode2;
+
+    const startAmbientSound = () => {
+      if (isSoundEnabled && !isLoading) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Create two oscillators for ambient sound
+        oscillator1 = audioContext.createOscillator();
+        oscillator2 = audioContext.createOscillator();
+        gainNode1 = audioContext.createGain();
+        gainNode2 = audioContext.createGain();
+        
+        oscillator1.connect(gainNode1);
+        oscillator2.connect(gainNode2);
+        gainNode1.connect(audioContext.destination);
+        gainNode2.connect(audioContext.destination);
+        
+        // Set frequencies for ambient drone
+        oscillator1.frequency.setValueAtTime(220, audioContext.currentTime);
+        oscillator2.frequency.setValueAtTime(330, audioContext.currentTime);
+        
+        // Set very low volume for ambient sound
+        gainNode1.gain.setValueAtTime(0.02, audioContext.currentTime);
+        gainNode2.gain.setValueAtTime(0.015, audioContext.currentTime);
+        
+        oscillator1.type = 'sine';
+        oscillator2.type = 'triangle';
+        
+        oscillator1.start();
+        oscillator2.start();
+      }
+    };
+
+    const stopAmbientSound = () => {
+      if (oscillator1) oscillator1.stop();
+      if (oscillator2) oscillator2.stop();
+      if (audioContext) audioContext.close();
+    };
+
+    if (isSoundEnabled && !isLoading) {
+      startAmbientSound();
+    }
+
+    return () => {
+      stopAmbientSound();
+    };
+  }, [isSoundEnabled, isLoading]);
 
   // Simulate loading time
   useEffect(() => {
@@ -392,14 +528,22 @@ function App() {
   const theme = {
     background: isDarkMode ? '#000' : '#f8f9fa',
     sectionBg: isDarkMode ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+    sectionBgAlt: isDarkMode ? 'rgba(0, 0, 0, 0.9)' : 'rgba(248, 249, 250, 0.9)',
     cardBg: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
     cardBgHover: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
-    textPrimary: isDarkMode ? '#fff' : '#333',
-    textSecondary: isDarkMode ? '#b0b0b0' : '#666',
+    inputBg: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+    textPrimary: isDarkMode ? '#fff' : '#1a1a1a',
+    textSecondary: isDarkMode ? '#b0b0b0' : '#4a5568',
+    textTertiary: isDarkMode ? '#888' : '#718096',
+    textGlow: isDarkMode ? '#fff' : '#2d3748', // For glowing text in light mode
     border: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
     borderHover: isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
+    borderInput: isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
     fogColor: isDarkMode ? '#000' : '#f0f0f0',
-    shadow: isDarkMode ? 'rgba(0, 0, 0, 0.3)' : 'rgba(0, 0, 0, 0.1)'
+    shadow: isDarkMode ? 'rgba(0, 0, 0, 0.3)' : 'rgba(0, 0, 0, 0.1)',
+    footerBg: isDarkMode ? 'rgba(0, 0, 0, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+    footerText: isDarkMode ? '#b0b0b0' : '#4a5568',
+    footerTextSecondary: isDarkMode ? '#888' : '#718096'
   };
 
   // Apply theme to document root for global CSS variables
@@ -724,7 +868,7 @@ function App() {
                   🎨 Creative Vision
                 </h3>
                 <p style={{
-                  color: '#b0b0b0',
+                  color: theme.textSecondary,
                   lineHeight: '1.7',
                   transition: 'color 0.3s ease'
                 }}>
@@ -794,7 +938,7 @@ function App() {
                   ⚡ Technical Excellence
                 </h3>
                 <p style={{
-                  color: '#b0b0b0',
+                  color: theme.textSecondary,
                   lineHeight: '1.7',
                   transition: 'color 0.3s ease'
                 }}>
@@ -883,7 +1027,7 @@ function App() {
                   50+
                 </div>
                 <div style={{ 
-                  color: '#888', 
+                  color: theme.textTertiary, 
                   fontSize: '1rem',
                   textTransform: 'uppercase',
                   letterSpacing: '1px',
@@ -966,7 +1110,7 @@ function App() {
                   5+
                 </div>
                 <div style={{ 
-                  color: '#888', 
+                  color: theme.textTertiary, 
                   fontSize: '1rem',
                   textTransform: 'uppercase',
                   letterSpacing: '1px',
@@ -1049,7 +1193,7 @@ function App() {
                   30+
                 </div>
                 <div style={{ 
-                  color: '#888', 
+                  color: theme.textTertiary, 
                   fontSize: '1rem',
                   textTransform: 'uppercase',
                   letterSpacing: '1px',
@@ -1069,7 +1213,7 @@ function App() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'rgba(0, 0, 0, 0.9)',
+          background: isDarkMode ? 'rgba(0, 0, 0, 0.9)' : 'rgba(248, 249, 250, 0.9)',
           backdropFilter: 'blur(15px)'
         }}>
           <div style={{
@@ -1091,7 +1235,7 @@ function App() {
             
             <p style={{
               fontSize: '1.2rem',
-              color: '#b0b0b0',
+              color: theme.textSecondary,
               marginBottom: '4rem',
               maxWidth: '600px',
               margin: '0 auto 4rem'
@@ -1238,7 +1382,7 @@ function App() {
                   </div>
                   <h3 style={{
                     fontSize: '1rem',
-                    color: '#fff',
+                    color: theme.textPrimary,
                     marginBottom: '0.5rem',
                     fontWeight: '600'
                   }}>
@@ -1260,7 +1404,7 @@ function App() {
         {/* Projects Section - Compact Gallery */}
         <div style={{
           padding: '4rem 2rem',
-          background: 'rgba(0, 0, 0, 0.9)',
+          background: isDarkMode ? 'rgba(0, 0, 0, 0.9)' : 'rgba(248, 249, 250, 0.9)',
           backdropFilter: 'blur(15px)'
         }}>
           <div style={{
@@ -1341,7 +1485,7 @@ function App() {
                   
                   <h3 style={{
                     fontSize: '1.4rem',
-                    color: '#fff',
+                    color: theme.textPrimary,
                     marginBottom: '0.5rem',
                     fontWeight: '700'
                   }}>
@@ -1349,7 +1493,7 @@ function App() {
                   </h3>
                   
                   <p style={{
-                    color: '#b0b0b0',
+                    color: theme.textSecondary,
                     lineHeight: '1.6',
                     marginBottom: '1.5rem',
                     fontSize: '0.95rem'
@@ -1420,7 +1564,7 @@ function App() {
         <div style={{
           minHeight: '100vh',
           padding: '5rem 2rem',
-          background: 'rgba(0, 0, 0, 0.9)',
+          background: isDarkMode ? 'rgba(0, 0, 0, 0.9)' : 'rgba(248, 249, 250, 0.9)',
           backdropFilter: 'blur(20px)'
         }}>
           <div style={{
@@ -1445,7 +1589,7 @@ function App() {
               
               <p style={{
                 fontSize: '1.2rem',
-                color: '#b0b0b0',
+                color: theme.textSecondary,
                 maxWidth: '600px',
                 margin: '0 auto',
                 lineHeight: '1.6'
@@ -1462,16 +1606,16 @@ function App() {
             }}>
               {/* Contact Form */}
               <div style={{
-                background: 'rgba(255, 255, 255, 0.05)',
+                background: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
                 backdropFilter: 'blur(25px)',
-                border: '1px solid rgba(255, 255, 255, 0.1)',
+                border: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'}`,
                 borderRadius: '25px',
                 padding: '3rem',
                 boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
               }}>
                 <h3 style={{
                   fontSize: '1.5rem',
-                  color: '#fff',
+                  color: theme.textPrimary,
                   marginBottom: '2rem',
                   fontWeight: '700'
                 }}>
@@ -1693,9 +1837,9 @@ function App() {
               {/* Contact Information */}
               <div>
                 <div style={{
-                  background: 'rgba(255, 255, 255, 0.05)',
+                  background: theme.cardBg,
                   backdropFilter: 'blur(25px)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  border: `1px solid ${theme.border}`,
                   borderRadius: '25px',
                   padding: '3rem',
                   marginBottom: '2rem',
@@ -1703,7 +1847,7 @@ function App() {
                 }}>
                   <h3 style={{
                     fontSize: '1.5rem',
-                    color: '#fff',
+                    color: theme.textPrimary,
                     marginBottom: '2rem',
                     fontWeight: '700'
                   }}>
@@ -1741,7 +1885,7 @@ function App() {
                           Email
                         </h4>
                         <p style={{
-                          color: '#b0b0b0',
+                          color: theme.textSecondary,
                           margin: 0
                         }}>
                           john.doe@example.com
@@ -1776,7 +1920,7 @@ function App() {
                           Phone
                         </h4>
                         <p style={{
-                          color: '#b0b0b0',
+                          color: theme.textSecondary,
                           margin: 0
                         }}>
                           +1 (555) 123-4567
@@ -1811,7 +1955,7 @@ function App() {
                           Location
                         </h4>
                         <p style={{
-                          color: '#b0b0b0',
+                          color: theme.textSecondary,
                           margin: 0
                         }}>
                           San Francisco, CA
@@ -1882,7 +2026,7 @@ function App() {
         </div>
 
         {/* Footer Section */}
-        <Footer />
+        <Footer isDarkMode={isDarkMode} theme={theme} playHoverSound={playHoverSound} />
       </div>
       
       {/* CSS Animations */}
