@@ -91,7 +91,6 @@ function Navbar({ isDarkMode, toggleTheme }) {
                 e.target.style.transform = 'translateY(-2px) scale(1.05)';
                 e.target.style.boxShadow = '0 8px 25px rgba(0, 212, 255, 0.2)';
                 e.target.style.textShadow = '0 0 10px rgba(0, 212, 255, 0.5)';
-                playHoverSound();
                 
                 // Create animated underline effect
                 if (!e.target.querySelector('.nav-underline')) {
@@ -142,10 +141,7 @@ function Navbar({ isDarkMode, toggleTheme }) {
 
         {/* Theme Toggle Button */}
         <button
-          onClick={() => {
-            toggleTheme();
-            playClickSound();
-          }}
+          onClick={toggleTheme}
           style={{
             width: '45px',
             height: '45px',
@@ -386,174 +382,11 @@ function App() {
     setIsDarkMode(!isDarkMode);
   };
 
-  // Pleasant sound effects
-  const playHoverSound = () => {
-    if (soundEnabled && window.AudioContext) {
-      try {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        const filterNode = audioContext.createBiquadFilter();
-        
-        oscillator.connect(filterNode);
-        filterNode.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        
-        // Gentle bell-like sound
-        oscillator.frequency.setValueAtTime(880, audioContext.currentTime);
-        oscillator.frequency.exponentialRampToValueAtTime(1320, audioContext.currentTime + 0.08);
-        oscillator.type = 'sine';
-        
-        // Soft filter for warmth
-        filterNode.type = 'lowpass';
-        filterNode.frequency.setValueAtTime(2000, audioContext.currentTime);
-        
-        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-        gainNode.gain.linearRampToValueAtTime(0.02, audioContext.currentTime + 0.005);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.08);
-        
-        oscillator.start(audioContext.currentTime);
-        oscillator.stop(audioContext.currentTime + 0.08);
-        
-        setTimeout(() => audioContext.close(), 150);
-      } catch (error) {
-        console.log('Audio not supported');
-      }
-    }
-  };
-
-  const playClickSound = () => {
-    if (soundEnabled && window.AudioContext) {
-      try {
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator1 = audioContext.createOscillator();
-        const oscillator2 = audioContext.createOscillator();
-        const gainNode1 = audioContext.createGain();
-        const gainNode2 = audioContext.createGain();
-        const masterGain = audioContext.createGain();
-        
-        oscillator1.connect(gainNode1);
-        oscillator2.connect(gainNode2);
-        gainNode1.connect(masterGain);
-        gainNode2.connect(masterGain);
-        masterGain.connect(audioContext.destination);
-        
-        // Pleasant chord-like click
-        oscillator1.frequency.setValueAtTime(523, audioContext.currentTime); // C5
-        oscillator2.frequency.setValueAtTime(659, audioContext.currentTime); // E5
-        oscillator1.type = 'sine';
-        oscillator2.type = 'sine';
-        
-        masterGain.gain.setValueAtTime(0, audioContext.currentTime);
-        masterGain.gain.linearRampToValueAtTime(0.03, audioContext.currentTime + 0.01);
-        masterGain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.12);
-        
-        gainNode1.gain.setValueAtTime(0.7, audioContext.currentTime);
-        gainNode2.gain.setValueAtTime(0.3, audioContext.currentTime);
-        
-        oscillator1.start(audioContext.currentTime);
-        oscillator2.start(audioContext.currentTime);
-        oscillator1.stop(audioContext.currentTime + 0.12);
-        oscillator2.stop(audioContext.currentTime + 0.12);
-        
-        setTimeout(() => audioContext.close(), 200);
-      } catch (error) {
-        console.log('Audio not supported');
-      }
-    }
-  };
-
-  // Pleasant ambient background sound
-  useEffect(() => {
-    let audioContext;
-    let oscillators = [];
-    let gainNodes = [];
-    let intervalId;
-    
-    if (soundEnabled && !isLoading && window.AudioContext) {
-      try {
-        audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        
-        // Create a more pleasant ambient soundscape
-        const frequencies = [110, 165, 220, 330]; // Harmonic frequencies
-        const volumes = [0.005, 0.003, 0.004, 0.002]; // Very low volumes
-        
-        frequencies.forEach((freq, index) => {
-          const oscillator = audioContext.createOscillator();
-          const gainNode = audioContext.createGain();
-          const filterNode = audioContext.createBiquadFilter();
-          
-          oscillator.connect(filterNode);
-          filterNode.connect(gainNode);
-          gainNode.connect(audioContext.destination);
-          
-          oscillator.frequency.setValueAtTime(freq, audioContext.currentTime);
-          oscillator.type = index % 2 === 0 ? 'sine' : 'triangle';
-          
-          // Add subtle filtering for warmth
-          filterNode.type = 'lowpass';
-          filterNode.frequency.setValueAtTime(800, audioContext.currentTime);
-          filterNode.Q.setValueAtTime(0.5, audioContext.currentTime);
-          
-          gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-          gainNode.gain.linearRampToValueAtTime(volumes[index], audioContext.currentTime + 2);
-          
-          oscillator.start();
-          oscillators.push(oscillator);
-          gainNodes.push(gainNode);
-        });
-        
-        // Add subtle frequency modulation for organic feel
-        intervalId = setInterval(() => {
-          if (audioContext && audioContext.state === 'running') {
-            oscillators.forEach((osc, index) => {
-              if (osc && osc.frequency) {
-                const baseFreq = frequencies[index];
-                const variation = Math.sin(Date.now() / 10000 + index) * 2;
-                osc.frequency.setValueAtTime(baseFreq + variation, audioContext.currentTime);
-              }
-            });
-          }
-        }, 100);
-        
-      } catch (error) {
-        console.log('Background audio not supported');
-      }
-    }
-    
-    return () => {
-      if (intervalId) clearInterval(intervalId);
-      if (audioContext) {
-        try {
-          oscillators.forEach(osc => {
-            if (osc) osc.stop();
-          });
-          audioContext.close();
-        } catch (error) {
-          console.log('Error closing audio context');
-        }
-      }
-    };
-  }, [soundEnabled, isLoading]);
-
-  // Simulate loading time and enable audio
+  // Simulate loading time
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-      // Enable audio context after user interaction
-      const enableAudio = () => {
-        if (window.AudioContext) {
-          const tempContext = new (window.AudioContext || window.webkitAudioContext)();
-          tempContext.resume().then(() => {
-            tempContext.close();
-          });
-        }
-        document.removeEventListener('click', enableAudio);
-        document.removeEventListener('keydown', enableAudio);
-      };
-      document.addEventListener('click', enableAudio);
-      document.addEventListener('keydown', enableAudio);
-    }, 1500);
+    }, 500); // Reduced loading time for debugging
     return () => clearTimeout(timer);
   }, []);
 
@@ -666,7 +499,7 @@ function App() {
       animation: 'fadeIn 0.8s ease-out'
     }}>
       {/* Navigation Header */}
-      <Navbar isDarkMode={isDarkMode} toggleTheme={toggleTheme} playHoverSound={playHoverSound} playClickSound={playClickSound} soundEnabled={soundEnabled} setSoundEnabled={setSoundEnabled} />
+      <Navbar isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
       
       {/* 3D Canvas */}
       <Canvas
@@ -1389,7 +1222,6 @@ function App() {
                     skill.color === '#3776ab' ? '55, 118, 171' :
                     '255, 255, 255'
                   }, 0.3)`;
-                  playHoverSound();
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0) rotateX(0)';
@@ -1499,7 +1331,6 @@ function App() {
                     project.color === '#4ecdc4' ? '78, 205, 196' : 
                     '255, 107, 107'
                   }, 0.3)`;
-                  playHoverSound();
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = 'translateY(0)';
