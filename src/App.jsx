@@ -24,6 +24,18 @@ function Navbar({ isDarkMode, toggleTheme }) {
     { id: 'contact', label: 'Contact' }
   ];
 
+  // Smooth scroll function
+  const scrollToSection = (sectionId) => {
+    const targetElement = document.getElementById(sectionId);
+    
+    if (targetElement) {
+      const offsetTop = targetElement.offsetTop - 80; // Account for fixed header
+      window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+    } else if (sectionId === 'home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
   return (
     <nav style={{
       position: 'fixed',
@@ -72,10 +84,12 @@ function Navbar({ isDarkMode, toggleTheme }) {
         }}>
           {navItems.map((item) => (
             <li key={item.id}>
-              <button style={{
-                background: 'none',
-                border: 'none',
-                color: isDarkMode ? '#b0b0b0' : '#666',
+              <button 
+                onClick={() => scrollToSection(item.id)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  color: isDarkMode ? '#b0b0b0' : '#666',
                 fontSize: '1rem',
                 fontWeight: '500',
                 cursor: 'pointer',
@@ -524,7 +538,7 @@ function App() {
       {/* Scrollable Content */}
       <div style={{ position: 'relative', zIndex: 10 }}>
         {/* Hero Section */}
-        <div style={{
+        <div id="home" style={{
           height: '100vh',
           display: 'flex',
           alignItems: 'center',
@@ -638,7 +652,7 @@ function App() {
         </div>
 
         {/* About Section */}
-        <div style={{
+        <div id="about" style={{
           minHeight: '100vh',
           padding: '5rem 2rem',
           display: 'flex',
@@ -1070,7 +1084,7 @@ function App() {
         </div>
 
         {/* Skills Section - 3D Skill Universe */}
-        <div style={{
+        <div id="skills" style={{
           minHeight: '100vh',
           padding: '5rem 2rem',
           display: 'flex',
@@ -1265,7 +1279,7 @@ function App() {
         </div>
 
         {/* Projects Section - Compact Gallery */}
-        <div style={{
+        <div id="projects" style={{
           padding: '4rem 2rem',
           background: isDarkMode ? 'rgba(0, 0, 0, 0.9)' : 'rgba(248, 249, 250, 0.9)',
           backdropFilter: 'blur(15px)'
@@ -1424,7 +1438,7 @@ function App() {
         </div>
 
         {/* Contact Section - Interactive Contact Form */}
-        <div style={{
+        <div id="contact" style={{
           minHeight: '100vh',
           padding: '5rem 2rem',
           background: isDarkMode ? 'rgba(0, 0, 0, 0.9)' : 'rgba(248, 249, 250, 0.9)',
