@@ -1,16 +1,27 @@
 import React from 'react';
 
-const Footer = ({ isDarkMode, theme, playHoverSound }) => {
+const Footer = ({ isDarkMode = true }) => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (playHoverSound) playHoverSound();
+  };
+
+  // Theme colors for footer
+  const theme = {
+    background: isDarkMode ? 'rgba(0, 0, 0, 0.95)' : 'rgba(248, 249, 250, 0.95)',
+    textPrimary: isDarkMode ? '#fff' : '#333',
+    textSecondary: isDarkMode ? '#b0b0b0' : '#666',
+    textTertiary: isDarkMode ? '#888' : '#999',
+    border: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+    cardBg: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+    iconBg: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+    iconBorder: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
   };
 
   return (
     <footer style={{
-      background: 'rgba(0, 0, 0, 0.95)',
+      background: theme.background,
       backdropFilter: 'blur(30px)',
-      borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+      borderTop: `1px solid ${theme.border}`,
       padding: '4rem 2rem 2rem',
       position: 'relative',
       zIndex: 10
@@ -40,7 +51,7 @@ const Footer = ({ isDarkMode, theme, playHoverSound }) => {
               JD
             </div>
             <p style={{
-              color: '#b0b0b0',
+              color: theme.textSecondary,
               lineHeight: '1.6',
               marginBottom: '2rem'
             }}>
@@ -111,9 +122,9 @@ const Footer = ({ isDarkMode, theme, playHoverSound }) => {
                   style={{
                     width: '45px',
                     height: '45px',
-                    background: 'rgba(255, 255, 255, 0.05)',
+                    background: theme.iconBg,
                     backdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    border: `1px solid ${theme.iconBorder}`,
                     borderRadius: '12px',
                     display: 'flex',
                     alignItems: 'center',
@@ -134,8 +145,8 @@ const Footer = ({ isDarkMode, theme, playHoverSound }) => {
                     e.target.style.transform = 'translateY(0) scale(1)';
                     e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)';
                     e.target.style.boxShadow = 'none';
-                    e.target.style.color = '#b0b0b0';
-                    e.target.style.background = 'rgba(255, 255, 255, 0.05)';
+                    e.target.style.color = theme.textSecondary;
+                    e.target.style.background = theme.iconBg;
                   }}
                 >
                   {social.icon}
@@ -166,7 +177,7 @@ const Footer = ({ isDarkMode, theme, playHoverSound }) => {
                   <a
                     href={`#${item.toLowerCase()}`}
                     style={{
-                      color: '#b0b0b0',
+                      color: theme.textSecondary,
                       textDecoration: 'none',
                       fontSize: '1rem',
                       transition: 'all 0.3s ease',
@@ -177,7 +188,7 @@ const Footer = ({ isDarkMode, theme, playHoverSound }) => {
                       e.target.style.paddingLeft = '10px';
                     }}
                     onMouseLeave={(e) => {
-                      e.target.style.color = '#b0b0b0';
+                      e.target.style.color = theme.textSecondary;
                       e.target.style.paddingLeft = '0';
                     }}
                   >
@@ -216,7 +227,7 @@ const Footer = ({ isDarkMode, theme, playHoverSound }) => {
                   <a
                     href="#"
                     style={{
-                      color: '#b0b0b0',
+                      color: theme.textSecondary,
                       textDecoration: 'none',
                       fontSize: '1rem',
                       transition: 'all 0.3s ease',
@@ -227,7 +238,7 @@ const Footer = ({ isDarkMode, theme, playHoverSound }) => {
                       e.target.style.paddingLeft = '10px';
                     }}
                     onMouseLeave={(e) => {
-                      e.target.style.color = '#b0b0b0';
+                      e.target.style.color = theme.textSecondary;
                       e.target.style.paddingLeft = '0';
                     }}
                   >
@@ -266,7 +277,7 @@ const Footer = ({ isDarkMode, theme, playHoverSound }) => {
                   <a
                     href="#"
                     style={{
-                      color: '#b0b0b0',
+                      color: theme.textSecondary,
                       textDecoration: 'none',
                       fontSize: '1rem',
                       transition: 'all 0.3s ease',
@@ -277,7 +288,7 @@ const Footer = ({ isDarkMode, theme, playHoverSound }) => {
                       e.target.style.paddingLeft = '10px';
                     }}
                     onMouseLeave={(e) => {
-                      e.target.style.color = '#b0b0b0';
+                      e.target.style.color = theme.textSecondary;
                       e.target.style.paddingLeft = '0';
                     }}
                   >
@@ -333,7 +344,7 @@ const Footer = ({ isDarkMode, theme, playHoverSound }) => {
           gap: '1rem'
         }}>
           <p style={{
-            color: '#888',
+            color: theme.textTertiary,
             fontSize: '0.9rem',
             margin: 0
           }}>
@@ -350,7 +361,7 @@ const Footer = ({ isDarkMode, theme, playHoverSound }) => {
                 key={i}
                 href="#"
                 style={{
-                  color: '#888',
+                  color: theme.textTertiary,
                   textDecoration: 'none',
                   fontSize: '0.9rem',
                   transition: 'color 0.3s ease'
@@ -359,7 +370,7 @@ const Footer = ({ isDarkMode, theme, playHoverSound }) => {
                   e.target.style.color = '#00d4ff';
                 }}
                 onMouseLeave={(e) => {
-                  e.target.style.color = '#888';
+                  e.target.style.color = theme.textTertiary;
                 }}
               >
                 {link}

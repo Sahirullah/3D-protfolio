@@ -5,7 +5,7 @@ import Footer from './sections/Footer';
 import './index.css';
 
 // Navigation Component
-function Navbar({ isDarkMode, toggleTheme }) {
+function Navbar({ isDarkMode, toggleTheme, playHoverSound, playClickSound, soundEnabled, setSoundEnabled }) {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -141,7 +141,7 @@ function Navbar({ isDarkMode, toggleTheme }) {
         {/* Sound Toggle Button */}
         <button
           onClick={() => {
-            setIsSoundEnabled(!isSoundEnabled);
+            setSoundEnabled(!soundEnabled);
             playClickSound();
           }}
           style={{
@@ -150,7 +150,7 @@ function Navbar({ isDarkMode, toggleTheme }) {
             background: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
             border: `1px solid ${isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)'}`,
             borderRadius: '50%',
-            color: isSoundEnabled ? '#4ecdc4' : (isDarkMode ? '#888' : '#999'),
+            color: soundEnabled ? '#4ecdc4' : (isDarkMode ? '#666' : '#999'),
             fontSize: '1.2rem',
             cursor: 'pointer',
             transition: 'all 0.3s ease',
@@ -162,8 +162,8 @@ function Navbar({ isDarkMode, toggleTheme }) {
           }}
           onMouseEnter={(e) => {
             e.target.style.transform = 'scale(1.1)';
-            e.target.style.boxShadow = `0 8px 25px ${isSoundEnabled ? 'rgba(78, 205, 196, 0.3)' : 'rgba(136, 136, 136, 0.2)'}`;
-            e.target.style.borderColor = isSoundEnabled ? '#4ecdc4' : (isDarkMode ? '#888' : '#999');
+            e.target.style.boxShadow = `0 8px 25px ${soundEnabled ? 'rgba(78, 205, 196, 0.3)' : 'rgba(102, 102, 102, 0.3)'}`;
+            e.target.style.borderColor = soundEnabled ? '#4ecdc4' : (isDarkMode ? '#666' : '#999');
             playHoverSound();
           }}
           onMouseLeave={(e) => {
@@ -172,12 +172,15 @@ function Navbar({ isDarkMode, toggleTheme }) {
             e.target.style.borderColor = isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)';
           }}
         >
-          {isSoundEnabled ? '🔊' : '🔇'}
+          {soundEnabled ? '🔊' : '🔇'}
         </button>
 
         {/* Theme Toggle Button */}
         <button
-          onClick={toggleTheme}
+          onClick={() => {
+            toggleTheme();
+            playClickSound();
+          }}
           style={{
             width: '45px',
             height: '45px',
@@ -413,55 +416,64 @@ function Scene() {
 function App() {
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
-  const [isSoundEnabled, setIsSoundEnabled] = useState(false);
+  const [soundEnabled, setSoundEnabled] = useState(false);
 
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
-    playHoverSound();
   };
 
   // Sound effects
   const playHoverSound = () => {
-    if (isSoundEnabled) {
-      // Create a subtle hover sound using Web Audio API
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-      oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.1);
-      
-      gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.01);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-      
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 0.1);
+    if (soundEnabled && window.AudioContext) {
+      try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(1200, audioContext.currentTime + 0.1);
+        
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.05, audioContext.currentTime + 0.01);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.1);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.1);
+        
+        setTimeout(() => audioContext.close(), 200);
+      } catch (error) {
+        console.log('Audio not supported');
+      }
     }
   };
 
   const playClickSound = () => {
-    if (isSoundEnabled) {
-      // Create a click sound
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      
-      oscillator.connect(gainNode);
-      gainNode.connect(audioContext.destination);
-      
-      oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
-      oscillator.frequency.exponentialRampToValueAtTime(300, audioContext.currentTime + 0.15);
-      
-      gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-      gainNode.gain.linearRampToValueAtTime(0.15, audioContext.currentTime + 0.01);
-      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
-      
-      oscillator.start(audioContext.currentTime);
-      oscillator.stop(audioContext.currentTime + 0.15);
+    if (soundEnabled && window.AudioContext) {
+      try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        
+        oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+        oscillator.frequency.exponentialRampToValueAtTime(300, audioContext.currentTime + 0.15);
+        
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.01);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.15);
+        
+        oscillator.start(audioContext.currentTime);
+        oscillator.stop(audioContext.currentTime + 0.15);
+        
+        setTimeout(() => audioContext.close(), 200);
+      } catch (error) {
+        console.log('Audio not supported');
+      }
     }
   };
 
@@ -469,12 +481,12 @@ function App() {
   useEffect(() => {
     let audioContext;
     let oscillator1, oscillator2, gainNode1, gainNode2;
-
-    const startAmbientSound = () => {
-      if (isSoundEnabled && !isLoading) {
+    
+    if (soundEnabled && !isLoading && window.AudioContext) {
+      try {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
         
-        // Create two oscillators for ambient sound
+        // Create ambient background sound
         oscillator1 = audioContext.createOscillator();
         oscillator2 = audioContext.createOscillator();
         gainNode1 = audioContext.createGain();
@@ -485,42 +497,38 @@ function App() {
         gainNode1.connect(audioContext.destination);
         gainNode2.connect(audioContext.destination);
         
-        // Set frequencies for ambient drone
         oscillator1.frequency.setValueAtTime(220, audioContext.currentTime);
         oscillator2.frequency.setValueAtTime(330, audioContext.currentTime);
         
-        // Set very low volume for ambient sound
-        gainNode1.gain.setValueAtTime(0.02, audioContext.currentTime);
-        gainNode2.gain.setValueAtTime(0.015, audioContext.currentTime);
+        gainNode1.gain.setValueAtTime(0.01, audioContext.currentTime);
+        gainNode2.gain.setValueAtTime(0.008, audioContext.currentTime);
         
         oscillator1.type = 'sine';
         oscillator2.type = 'triangle';
         
         oscillator1.start();
         oscillator2.start();
+      } catch (error) {
+        console.log('Background audio not supported');
+      }
+    }
+    
+    return () => {
+      if (audioContext) {
+        try {
+          audioContext.close();
+        } catch (error) {
+          console.log('Error closing audio context');
+        }
       }
     };
-
-    const stopAmbientSound = () => {
-      if (oscillator1) oscillator1.stop();
-      if (oscillator2) oscillator2.stop();
-      if (audioContext) audioContext.close();
-    };
-
-    if (isSoundEnabled && !isLoading) {
-      startAmbientSound();
-    }
-
-    return () => {
-      stopAmbientSound();
-    };
-  }, [isSoundEnabled, isLoading]);
+  }, [soundEnabled, isLoading]);
 
   // Simulate loading time
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 2500);
+    }, 1500); // Reduced loading time
     return () => clearTimeout(timer);
   }, []);
 
@@ -532,18 +540,14 @@ function App() {
     cardBg: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
     cardBgHover: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
     inputBg: isDarkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
-    textPrimary: isDarkMode ? '#fff' : '#1a1a1a',
-    textSecondary: isDarkMode ? '#b0b0b0' : '#4a5568',
-    textTertiary: isDarkMode ? '#888' : '#718096',
-    textGlow: isDarkMode ? '#fff' : '#2d3748', // For glowing text in light mode
+    textPrimary: isDarkMode ? '#fff' : '#333',
+    textSecondary: isDarkMode ? '#b0b0b0' : '#666',
+    textTertiary: isDarkMode ? '#888' : '#999',
     border: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
     borderHover: isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
     borderInput: isDarkMode ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.2)',
     fogColor: isDarkMode ? '#000' : '#f0f0f0',
-    shadow: isDarkMode ? 'rgba(0, 0, 0, 0.3)' : 'rgba(0, 0, 0, 0.1)',
-    footerBg: isDarkMode ? 'rgba(0, 0, 0, 0.95)' : 'rgba(255, 255, 255, 0.95)',
-    footerText: isDarkMode ? '#b0b0b0' : '#4a5568',
-    footerTextSecondary: isDarkMode ? '#888' : '#718096'
+    shadow: isDarkMode ? 'rgba(0, 0, 0, 0.3)' : 'rgba(0, 0, 0, 0.1)'
   };
 
   // Apply theme to document root for global CSS variables
@@ -637,7 +641,7 @@ function App() {
       animation: 'fadeIn 0.8s ease-out'
     }}>
       {/* Navigation Header */}
-      <Navbar isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+      <Navbar isDarkMode={isDarkMode} toggleTheme={toggleTheme} playHoverSound={playHoverSound} playClickSound={playClickSound} soundEnabled={soundEnabled} setSoundEnabled={setSoundEnabled} />
       
       {/* 3D Canvas */}
       <Canvas
@@ -2026,7 +2030,7 @@ function App() {
         </div>
 
         {/* Footer Section */}
-        <Footer isDarkMode={isDarkMode} theme={theme} playHoverSound={playHoverSound} />
+        <Footer isDarkMode={isDarkMode} />
       </div>
       
       {/* CSS Animations */}
